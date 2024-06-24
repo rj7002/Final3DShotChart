@@ -125,7 +125,7 @@ if selected_season:
     
     # Load the CSV file
     csv_file = 'season.csv'
-    df = pd.read_csv(csv_file)
+    df = pd.read_csv('season.csv')
     games = []
     for index, row in df.iterrows():
         # Concatenate home team and away team names for the current row
