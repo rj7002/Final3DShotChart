@@ -467,6 +467,18 @@ if final_gameid:
                 team=row['team']
             )
             shot_df = shot.get_shot_path_coordinates()
+            if Quarter:
+                shot_df = shot_df[shot_df['period.displayValue'].isin(quart)]
+            if Shotdist:
+                shot_df = shot_df[(shot_df['Shot Distance'] >= shotdistance_min) & (shot_df['Shot Distance'] <= shotdistance_max)]
+            if Player:
+                shot_df = shot_df[shot_df['text'].str.contains('|'.join(players), case=False, na=False)]
+            if Shottype:
+                shot_df = shot_df[shot_df['type.text'].isin(finaltype)]
+            if Points:
+                shot_df = shot_df[shot_df['scoreValue'] == int(points)]
+            if Time:
+                shot_df = shot_df[(shot_df['clock.minutes'] >= timemin) & (shot_df['clock.minutes'] <= timemax)]
 
             # Determine color and symbol based on shot made or missed
             if row['scoringPlay']:
