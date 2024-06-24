@@ -143,7 +143,7 @@ if final_gameid:
     df = pd.read_csv(input_csv)
 
     # Replace 1 with True and 0 with False in 'SHOT_MADE_FLAG' column
-    team_id = df['team.id'][0]
+    team_id = df['team.id'][1]
 
     # Write the modified DataFrame back to CSV
     # df.to_csv(output_csv, index=False)
