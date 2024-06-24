@@ -407,7 +407,7 @@ if final_gameid:
             # Determine color and symbol based on shot made or missed
             if row['scoringPlay']:
                 marker_color = 'blue' if row['team'] == 'home' else 'red'
-                marker_symbol = 'circle'
+                marker_symbol = 'circle-open'
             else:
                 marker_color = 'blue' if row['team'] == 'home' else 'red'
                 marker_symbol = 'x'
