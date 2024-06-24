@@ -126,15 +126,31 @@ if selected_season:
     # Load the CSV file
     csv_file = 'season.csv'
     df = pd.read_csv(csv_file)
-    # Assuming 'game_id' is the column in season.csv that contains game IDs
-    game_ids = df['game_id'].tolist()
+    games = []
+    for index, row in df.iterrows():
+        # Concatenate home team and away team names for the current row
+        ddate2 = row['date']
+        parsed_date2 = datetime.strptime(ddate2, "%Y-%m-%dT%H:%MZ")
     
-    # Create a selectbox in Streamlit
-    final_gameid = st.selectbox('Select Game ID', ['']+ game_ids)
+        # Format the datetime object into the desired string format
+        formatted_date2 = parsed_date2.strftime("%m/%d/%Y")
+        typegame = row['notes_headline']
+        if selected_season > 2003 and pd.isna(typegame):
+            typegame = 'Regular Season' 
+        else:
+            typegame = ''
+        game = f"{row['home_display_name']} vs {row['away_display_name']} | {typegame} | {formatted_date2} ({row['game_id']})"
+        # Append the concatenated string to the games list
+        games.append(game)# Create a selectbox in Streamlit
+    games = st.selectbox('Select game', [''] + games)
+    parts = games.split('-')
     
-    if final_gameid:
+    # Extract the last element (which contains the number) and strip any extra whitespace
+    id = parts[-1].strip()
+        
+    if id:
         fdf = pd.read_csv('season.csv')
-        filtered_df = fdf[fdf['game_id'] == final_gameid]
+        filtered_df = fdf[fdf['game_id'] == id]
     
     # Assuming 'date' is the column you want to extract
         if not filtered_df.empty:
@@ -178,7 +194,7 @@ if selected_season:
         Player = st.sidebar.toggle('Players')
         if Player == 1:
             import sportsdataverse.nba.nba_game_rosters as nba_rosters
-            roster_data = nba_rosters.espn_nba_game_rosters(game_id=final_gameid, return_as_pandas=True)
+            roster_data = nba_rosters.espn_nba_game_rosters(game_id=id, return_as_pandas=True)
             player_names = roster_data['full_name'].tolist()
             players = st.sidebar.multiselect('',player_names)
         Shottype = st.sidebar.toggle('Shot Type')
@@ -209,7 +225,7 @@ if selected_season:
     
     
         df2 = pd.read_csv('nba_play_by_play.csv')
-        st.markdown(f'<h3 style="color: gray;text-align:center;">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]} vs {df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]} - {formatted_date}</h3>', unsafe_allow_html=True)
+        st.markdown(f'<h3 style="color: gray;text-align:center;">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]} vs {df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}</h3>', unsafe_allow_html=True)
         st.subheader('')
         hometeam = df['homeTeamName'].iloc[0] + " " + df['homeTeamMascot'].iloc[0]
         awayteam = df['awayTeamName'].iloc[0] + " " + df['awayTeamMascot'].iloc[0]
