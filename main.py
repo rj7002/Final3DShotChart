@@ -543,7 +543,7 @@ if selected_season:
     
                     # Update the placeholder with the updated figure
                     placeholder.plotly_chart(fig, use_container_width=True)
-                    time.sleep(0.2)
+                    time.sleep(0.02)
     
             # Final update of the placeholder with the fully rendered figure
             placeholder.plotly_chart(fig, use_container_width=True)
