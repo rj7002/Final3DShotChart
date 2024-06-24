@@ -225,6 +225,7 @@ if selected_season:
     
     
         df2 = pd.read_csv('nba_play_by_play.csv')
+        st.markdown(f'<h3 style="color: gray;text-align:center;">{games}</h3>', unsafe_allow_html=True)
         st.markdown(f'<h3 style="color: gray;text-align:center;">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]} vs {df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}</h3>', unsafe_allow_html=True)
         st.subheader('')
         hometeam = df['homeTeamName'].iloc[0] + " " + df['homeTeamMascot'].iloc[0]
