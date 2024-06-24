@@ -407,10 +407,10 @@ if final_gameid:
             # Determine color and symbol based on shot made or missed
             if row['scoringPlay']:
                 marker_color = 'blue' if row['team'] == 'home' else 'red'
-                marker_symbol = 'circle-open'
+                marker_symbol = 'circle'
             else:
-                marker_color = 'gray'
-                marker_symbol = 'cross'
+                marker_color = 'blue' if row['team'] == 'home' else 'red'
+                marker_symbol = 'x'
 
             # Add each point one by one to the figure
             text_all = (
@@ -427,7 +427,7 @@ if final_gameid:
                         z=[shot_row['z']],
                         mode='markers',
                         marker=dict(
-                            size=5,
+                            size=4,
                             color=marker_color,
                             symbol=marker_symbol,
                             line=dict(width=0)
