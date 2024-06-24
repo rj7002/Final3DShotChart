@@ -128,6 +128,7 @@ if selected_season:
     df = pd.read_csv('season.csv')
     games = []
     for index, row in df.iterrows():
+        st.write(row)
         # Concatenate home team and away team names for the current row
         ddate2 = row['date']
         parsed_date2 = datetime.strptime(ddate2, "%Y-%m-%dT%H:%MZ")
