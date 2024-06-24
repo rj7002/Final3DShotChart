@@ -1,10 +1,11 @@
 from datetime import date
+from datetime import datetime
 import requests
 import streamlit as st
 import plotly.express as px
 import pandas as pd
-from courtCoordinates import CourtCoordinates
-from basketballShot import BasketballShot
+from utils.courtCoordinates import CourtCoordinates
+from utils.basketballShot import BasketballShot
 import pandas as pd
 from sportsdataverse.nba.nba_pbp import espn_nba_pbp
 import plotly.graph_objects as go  # Import Plotly graph objects separately
@@ -120,7 +121,6 @@ nba_df.to_csv('season.csv')
 # Load the CSV file
 csv_file = 'season.csv'
 df = pd.read_csv(csv_file)
-
 # Assuming 'game_id' is the column in season.csv that contains game IDs
 game_ids = df['game_id'].tolist()
 
@@ -128,6 +128,16 @@ game_ids = df['game_id'].tolist()
 final_gameid = st.selectbox('Select Game ID', game_ids)
 
 if final_gameid:
+    fdf = pd.read_csv('season.csv')
+    filtered_df = fdf[fdf['game_id'] == final_gameid]
+
+# Assuming 'date' is the column you want to extract
+    if not filtered_df.empty:
+        ddate = filtered_df['date'].iloc[0]
+        parsed_date = datetime.strptime(ddate, "%Y-%m-%dT%H:%MZ")
+
+        # Format the datetime object into the desired string format
+        formatted_date = parsed_date.strftime("%m/%d/%Y")
     fetch_and_save_nba_pbp(game_id=final_gameid,output_file=output_csv)
 
     df = pd.read_csv(input_csv)
@@ -194,7 +204,7 @@ if final_gameid:
 
 
     df2 = pd.read_csv('nba_play_by_play.csv')
-    st.markdown(f'<h3 style="color: gray;text-align:center;">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]} vs {df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]} - {df["season"].iloc[0]}</h3>', unsafe_allow_html=True)
+    st.markdown(f'<h3 style="color: gray;text-align:center;">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]} vs {df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]} - {formatted_date}</h3>', unsafe_allow_html=True)
     st.subheader('')
     hometeam = df['homeTeamName'].iloc[0] + " " + df['homeTeamMascot'].iloc[0]
     awayteam = df['awayTeamName'].iloc[0] + " " + df['awayTeamMascot'].iloc[0]
