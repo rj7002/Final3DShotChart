@@ -159,7 +159,7 @@ if selected_season:
     
             # Format the datetime object into the desired string format
             formatted_date = parsed_date.strftime("%m/%d/%Y")
-        fetch_and_save_nba_pbp(game_id=final_gameid,output_file=output_csv)
+        fetch_and_save_nba_pbp(game_id=id,output_file=output_csv)
     
         df = pd.read_csv(input_csv)
     
