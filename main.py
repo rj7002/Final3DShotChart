@@ -472,7 +472,7 @@ if final_gameid:
             if Shotdist:
                 shot_df = shot_df[(shot_df['Shot Distance'] >= shotdistance_min) & (shot_df['Shot Distance'] <= shotdistance_max)]
             if Player:
-                shot_df = shot_df[shot_df['text'].str.contains('|'.join(players), case=False, na=False)]
+                shot_df = shot_df[shot_df['description'].str.contains('|'.join(players), case=False, na=False)]
             if Shottype:
                 shot_df = shot_df[shot_df['type.text'].isin(finaltype)]
             if Points:
