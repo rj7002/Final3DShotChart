@@ -397,18 +397,17 @@ if selected_season:
                 yaxis=dict(title='', showticklabels=False, showgrid=False),
                 zaxis=dict(title='',  showticklabels=False, showgrid=False, showbackground=True, backgroundcolor='#D2B48C'),
             ),
-            showlegend = False,
-            # legend=dict(
-            #     yanchor='top',
-            #     y=0.05,
-            #     x=0.2,
-            #     xanchor='left',
-            #     orientation='h',
-            #     font=dict(size=15, color='gray'),
-            #     bgcolor='rgba(0, 0, 0, 0)',
-            #     title='',
-            #     itemsizing='constant'
-            # ),
+            legend=dict(
+                yanchor='top',
+                y=0.05,
+                x=0.2,
+                xanchor='left',
+                orientation='h',
+                font=dict(size=15, color='gray'),
+                bgcolor='rgba(0, 0, 0, 0)',
+                title='',
+                itemsizing='constant'
+            ),
             legend_traceorder="reversed"
         )
         play = st.sidebar.button('Play by play')
