@@ -434,7 +434,8 @@ if final_gameid:
                         ),
                         hoverinfo='text',
                         hovertemplate="<b>%{customdata}</b><extra></extra>",
-                        customdata=[shot_row['description']]
+                        customdata=[shot_row['description']],
+                         showlegend=False
                     )
                 )
 
