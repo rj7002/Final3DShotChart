@@ -9,7 +9,7 @@ from basketballShot import BasketballShot
 import pandas as pd
 from sportsdataverse.nba.nba_pbp import espn_nba_pbp
 import plotly.graph_objects as go  # Import Plotly graph objects separately
-
+import time
 
 def fetch_and_save_nba_pbp(game_id, output_file):
     try:
@@ -543,6 +543,7 @@ if selected_season:
     
                     # Update the placeholder with the updated figure
                     placeholder.plotly_chart(fig, use_container_width=True)
+                    time.sleep(2)
     
             # Final update of the placeholder with the fully rendered figure
             placeholder.plotly_chart(fig, use_container_width=True)
