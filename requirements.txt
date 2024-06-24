@@ -1,0 +1,7 @@
+requests
+streamlit
+plotly
+pandas
+sportsdataverse
+datetime
+tqdm
