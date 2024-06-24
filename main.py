@@ -86,7 +86,7 @@ def display_team_image(teamname, width2):
     
         # st.image(image_url, width=width2, caption=caption2)
     else:
-        image_url = "https://cdn.nba.com/headshots/nba/latest/1040x760/fallback.png"
+        image_url = "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/nba.png&w=250&h=250"
         st.markdown(
         f'<div style="display: flex; flex-direction: column; align-items: center;">'
         f'<img src="{image_url}" style="width: {width2}px;">'
