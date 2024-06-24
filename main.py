@@ -109,7 +109,7 @@ output_csv = 'nba_play_by_play.csv'  # Replace with desired output file path
 current_year = date.today().year
 
 # Create a selectbox in Streamlit with options from 2002 to the current year
-selected_season = st.selectbox('Select a season', range(2002, current_year + 1))
+selected_season = st.selectbox('Select a season', [''] + list(range(2002, current_year + 1)), index=0)
 from sportsdataverse.nba.nba_loaders import load_nba_schedule
 
 # Load NBA schedule for the 2007 season
@@ -125,7 +125,7 @@ df = pd.read_csv(csv_file)
 game_ids = df['game_id'].tolist()
 
 # Create a selectbox in Streamlit
-final_gameid = st.selectbox('Select Game ID', game_ids)
+final_gameid = st.selectbox('Select Game ID', ['']+ game_ids)
 
 if final_gameid:
     fdf = pd.read_csv('season.csv')
