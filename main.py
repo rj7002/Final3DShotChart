@@ -268,7 +268,7 @@ if final_gameid:
         game_coords_df = pd.concat([game_coords_df, shot_df])
 
     # draw shot paths
-    color_map={'home':'blue','away:':'red'}
+    color_map={'home':'blue','away:':'green'}
 
     shot_path_fig = px.line_3d(
         data_frame=game_coords_df,
@@ -287,7 +287,7 @@ if final_gameid:
     # shot start scatter plots
     game_coords_start = game_coords_df[game_coords_df['shot_coord_index'] == 0]
     symbol_map={'made': 'circle-open', 'missed': 'cross'}
-    color_map={'home':'blue','away:':'red'}
+    color_map={'home':'blue','away:':'green'}
     shot_start_fig = px.scatter_3d(
         data_frame=game_coords_start,
         x='x',
