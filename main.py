@@ -397,6 +397,7 @@ if selected_season:
                 yaxis=dict(title='', showticklabels=False, showgrid=False),
                 zaxis=dict(title='',  showticklabels=False, showgrid=False, showbackground=True, backgroundcolor='#D2B48C'),
             ),
+            showlegend = False,
             # legend=dict(
             #     yanchor='top',
             #     y=0.05,
