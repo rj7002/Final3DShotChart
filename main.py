@@ -47,7 +47,7 @@ def map_team_to_abbreviation(team_name):
         'Portland Trail Blazers': 'por',
         'Utah Jazz': 'utah',
         'Golden State Warriors': 'gs',
-        'Los Angeles Clippers': 'lac',
+        'LA Clippers': 'lac',
         'Los Angeles Lakers': 'lal',
         'Phoenix Suns': 'phx',
         'Sacramento Kings': 'sac',
