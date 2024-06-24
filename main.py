@@ -137,7 +137,7 @@ if selected_season:
         typegame = row['notes_headline']
         if selected_season > 2003 and pd.isna(typegame):
             typegame = 'Regular Season' 
-        else:
+        elif selected_season <= 2003 and pd.isna(typegame):
             typegame = ''
         game = f"{row['home_display_name']} vs {row['away_display_name']} | {typegame} | {formatted_date2} ({row['game_id']})"
         # Append the concatenated string to the games list
