@@ -3,11 +3,12 @@ import requests
 import streamlit as st
 import plotly.express as px
 import pandas as pd
-from courtCoordinates import CourtCoordinates
-from basketballShot import BasketballShot
+from utils.courtCoordinates import CourtCoordinates
+from utils.basketballShot import BasketballShot
 import pandas as pd
 from sportsdataverse.nba.nba_pbp import espn_nba_pbp
 import plotly.graph_objects as go  # Import Plotly graph objects separately
+
 
 def fetch_and_save_nba_pbp(game_id, output_file):
     try:
@@ -98,6 +99,7 @@ def display_team_image(teamname, width2):
 st.set_page_config(page_title="3D NBA Shot Chart", page_icon='https://www.shutterstock.com/image-vector/basketball-player-shooting-ball-abstract-260nw-1059100829.jpg',layout="wide")
 st.markdown(f'<h3 style="color: gray; text-align: center; font-size: 100px;">3D NBA Shot Chart</h3>', unsafe_allow_html=True)
 
+st.sidebar.markdown('<div style="text-align: center;"><span style="font-size:30px;">3D NBA Shot Chart</span></div>', unsafe_allow_html=True)
 input_csv = 'nba_play_by_play.csv'  # Replace with your actual CSV file path
 output_csv = 'nba_play_by_play.csv'  # Replace with desired output file path
 
@@ -148,9 +150,48 @@ if final_gameid:
     df['away_color'] = '99bfe5'
     df = df[df['shootingPlay'] == True]
     df = df[~df['type.text'].str.contains('free throw', case=False, na=False)]
+    df['Shot Distance'] = ((df['coordinate.x'] - 25).pow(2) +
+                       (df['coordinate.y'] - df.apply(lambda row: 89.75 if row['team'] == 'away' else 4.25, axis=1)).pow(2)).pow(0.5)
+    df.loc[df['team'] == 'away', 'Shot Distance'] = abs(df.loc[df['team'] == 'away', 'Shot Distance'] - 94)
+
 
 
     df.to_csv(output_csv, index=False)
+    Quarter = st.sidebar.toggle('Quarter')
+    if Quarter == 1:
+        quart = st.sidebar.multiselect('',['1st Quarter','2nd Quarter','3rd Quarter','4th Quarter'])
+    Player = st.sidebar.toggle('Players')
+    if Player == 1:
+        import sportsdataverse.nba.nba_game_rosters as nba_rosters
+        roster_data = nba_rosters.espn_nba_game_rosters(game_id=final_gameid, return_as_pandas=True)
+        player_names = roster_data['full_name'].tolist()
+        players = st.sidebar.multiselect('',player_names)
+    Shottype = st.sidebar.toggle('Shot Type')
+    if Shottype == 1:
+        shottype = st.sidebar.selectbox('', ['Jump Shot', 'Layup','Dunk','Other'])
+        if shottype == 'Jump Shot':
+            jumpshottype = st.sidebar.multiselect('', ['Step Back Jump shot', 'Running Pull-Up Jump Shot','Turnaround Fade Away shot','Fade Away Jump Shot','Pullup Jump Shot','Jump Bank Shot','Jump Shot'])
+            finaltype = jumpshottype
+        elif shottype == 'Layup':
+            layuptype = st.sidebar.multiselect('', ['Layup Shot', 'Running Finger Roll Layup Shot','Cutting Layup Shot','Driving Layup Shot','Running Layup Shot','Alley Oop Layup shot','Tip Layup Shot','Reverse Layup Shot','Driving Reverse Layup Shot','Running Reverse Layup Shot'])
+            finaltype = layuptype
+        elif shottype == 'Dunk':
+            dunktype = st.sidebar.multiselect('', ['Running Dunk Shot', 'Cutting Dunk Shot','Running Reverse Dunk Shot','Running Alley Oop Dunk Shot','Dunk Shot','Tip Dunk Shot'])    
+            finaltype = dunktype
+        elif shottype == 'Other':
+            othertype = st.sidebar.multiselect('', ['Driving Floating Jump Shot', 'Floating Jump shot','Driving Floating Bank Jump Shot','Driving Bank Hook Shot','Driving Hook Shot','Turnaround Hook Shot','Hook Shot'])
+            finaltype = othertype
+    Points = st.sidebar.toggle('Points')
+    if Points == 1:
+        points = st.sidebar.selectbox('',['2','3'])
+    Time = st.sidebar.toggle('Time')
+    if Time == 1:
+        timemin, timemax = st.sidebar.slider("Time Remaining (Minutes)", 0, 15, (0, 15))
+    Shotdist = st.sidebar.toggle('Shot Distance')
+    if Shotdist == 1:
+        shotdistance_min, shotdistance_max = st.sidebar.slider("Shot Distance", 0, 94, (0, 94))
+    
+
 
     df2 = pd.read_csv('nba_play_by_play.csv')
     st.markdown(f'<h3 style="color: gray;text-align:center;">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]} vs {df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]} - {df["season"].iloc[0]}</h3>', unsafe_allow_html=True)
@@ -219,12 +260,27 @@ if final_gameid:
     schedule_df = pd.read_csv('nba_play_by_play.csv')
     play_by_play_df = pd.read_csv('nba_play_by_play.csv')
 
+
     # create single selection option
     # schedule_options = schedule_df[['GAME','GAME_ID']].set_index('GAME_ID')['GAME'].to_dict()
     # game_selection = st.sidebar.selectbox('Select Game', schedule_options.keys(), format_func=lambda x:schedule_options[x])
 
     # filter game specific values
+            
+
     game_shots_df = pd.read_csv('nba_play_by_play.csv')
+    if Quarter:
+        game_shots_df = game_shots_df[game_shots_df['period.displayValue'].isin(quart)]
+    if Shotdist:
+        game_shots_df = game_shots_df[(game_shots_df['Shot Distance'] >= shotdistance_min) & (game_shots_df['Shot Distance'] <= shotdistance_max)]
+    if Player:
+         game_shots_df = game_shots_df[game_shots_df['text'].str.contains('|'.join(players), case=False, na=False)]
+    if Shottype:
+        game_shots_df = game_shots_df[game_shots_df['type.text'].isin(finaltype)]
+    if Points:
+        game_shots_df = game_shots_df[game_shots_df['scoreValue'] == int(points)]
+    if Time:
+        game_shots_df = game_shots_df[(game_shots_df['clock.minutes'] >= timemin) & (game_shots_df['clock.minutes'] <= timemax)]
     home_color = schedule_df['home_color']
     away_color = schedule_df['away_color']
     # st.title(game_text)
@@ -263,7 +319,6 @@ if final_gameid:
             shot_made=row['scoringPlay'],
             team=row['team'])
             # quarter=row['period.displayValue'])
-            
         shot_df = shot.get_shot_path_coordinates()
         game_coords_df = pd.concat([game_coords_df, shot_df])
 
@@ -341,7 +396,6 @@ if final_gameid:
         legend_traceorder="reversed"
     )
     play = st.button('Play by play')
-    plot = st.button('Normal plot')
     if play:
                 # Draw basketball court lines
         court = CourtCoordinates()
@@ -444,5 +498,5 @@ if final_gameid:
 
         # Final update of the placeholder with the fully rendered figure
         placeholder.plotly_chart(fig, use_container_width=True)
-    if plot:
+    else:
         st.plotly_chart(fig, use_container_width=True)
