@@ -125,10 +125,9 @@ if selected_season:
     
     # Load the CSV file
     csv_file = 'season.csv'
-    df = pd.read_csv('season.csv')
+    df = pd.read_csv(csv_file)
     games = []
     for index, row in df.iterrows():
-        st.write(row)
         # Concatenate home team and away team names for the current row
         ddate2 = row['date']
         parsed_date2 = datetime.strptime(ddate2, "%Y-%m-%dT%H:%MZ")
@@ -148,6 +147,7 @@ if selected_season:
     
     # Extract the last element (which contains the number) and strip any extra whitespace
     id = parts[-1].strip()
+    st.write(id)
     if id:
         fdf = pd.read_csv('season.csv')
         filtered_df = fdf[fdf['game_id'] == id]
