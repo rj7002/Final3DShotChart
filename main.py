@@ -147,7 +147,7 @@ if selected_season:
     
     # Extract the last element (which contains the number) and strip any extra whitespace
     id = parts[-1].strip()
-        
+    st.write(id)
     if id:
         fdf = pd.read_csv('season.csv')
         filtered_df = fdf[fdf['game_id'] == id]
