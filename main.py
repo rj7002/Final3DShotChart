@@ -102,6 +102,8 @@ st.markdown(f'<h3 style="color: gray; text-align: center; font-size: 100px;">3D 
 
 st.sidebar.markdown('<div style="text-align: center;"><span style="font-size:30px;">3D NBA Shot Visualizer</span></div>', unsafe_allow_html=True)
 st.sidebar.subheader('')
+st.sidebar.markdown('<div style="text-align: center;"><span style="font-size:20px;">Filters</span></div>', unsafe_allow_html=True)
+st.sidebar.subheader('')
 
 input_csv = 'nba_play_by_play.csv'  # Replace with your actual CSV file path
 output_csv = 'nba_play_by_play.csv'  # Replace with desired output file path
@@ -113,9 +115,6 @@ current_year = date.today().year
 # Create a selectbox in Streamlit with options from 2002 to the current year
 selected_season = st.selectbox('Select a season', [''] + list(range(2002, current_year + 1)), index=0)
 if selected_season:
-    st.sidebar.markdown('<div style="text-align: center;"><span style="font-size:20px;">Filters</span></div>', unsafe_allow_html=True)
-    st.sidebar.subheader('')
-
     from sportsdataverse.nba.nba_loaders import load_nba_schedule
     
     # Load NBA schedule for the 2007 season
@@ -226,10 +225,6 @@ if selected_season:
     
     
         df2 = pd.read_csv('nba_play_by_play.csv')
-        last_hyphen_index = games.rfind('-')
-
-        result = games[:last_hyphen_index].strip()
-        st.markdown(f'<h3 style="color: gray;text-align:center;">{result}</h3>', unsafe_allow_html=True)
         st.markdown(f'<h3 style="color: gray;text-align:center;">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]} vs {df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}</h3>', unsafe_allow_html=True)
         st.subheader('')
         hometeam = df['homeTeamName'].iloc[0] + " " + df['homeTeamMascot'].iloc[0]
