@@ -139,7 +139,7 @@ if selected_season:
             typegame = 'Regular Season' 
         elif selected_season <= 2003 and pd.isna(typegame):
             typegame = ''
-        game = f"{row['home_display_name']} vs {row['away_display_name']} | {typegame} | {formatted_date2} ({row['game_id']})"
+        game = f"{row['home_display_name']} vs {row['away_display_name']} - {typegame} - {formatted_date2} - {row['game_id']}"
         # Append the concatenated string to the games list
         games.append(game)# Create a selectbox in Streamlit
     games = st.selectbox('Select game', [''] + games)
