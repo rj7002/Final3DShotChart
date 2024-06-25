@@ -564,11 +564,16 @@ if selected_season:
                 # traces.append(trace)
     
                 # Update the plot with the new trace
+                
                 fig.add_trace(trace)
                 message = row['text']
                 message2 = row['period.displayValue']
                 message3 = row['clock.displayValue']
-                messages.append(f'{message} - {message2}: {message3}')
+                if row['scoringPlay'] == True:
+                    finalmessage = f"✅ {message} - {message2}: {message3}"
+                else:
+                    finalmessage = f"❌ {message} - {message2}: {message3}"
+                messages.append(finalmessage)
                 placeholder.plotly_chart(fig, use_container_width=True)
                 message_placeholder.text(message)
                 if message == None:
