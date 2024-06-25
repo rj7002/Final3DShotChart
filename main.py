@@ -180,7 +180,7 @@ if selected_season:
         df = pd.read_csv(input_csv)
     
         # Replace 1 with True and 0 with False in 'SHOT_MADE_FLAG' column
-        team_id = df['team.id'][1]
+        team_id = df['homeTeamId'][1]
     
         # Write the modified DataFrame back to CSV
         # df.to_csv(output_csv, index=False)
@@ -316,6 +316,30 @@ if selected_season:
     
         schedule_df = pd.read_csv('nba_play_by_play.csv')
         play_by_play_df = pd.read_csv('nba_play_by_play.csv')
+        import sportsdataverse.nba as nba
+        nba_teams_df = nba.espn_nba_teams(return_as_pandas=True)
+        home = nba_teams_df[nba_teams_df['team_display_name'] == hometeam]
+        away = nba_teams_df[nba_teams_df['team_display_name'] == awayteam]
+        home_color = home['team_color'].iloc[0]
+        home_color2 = home['team_alternate_color'].iloc[0]
+        away_color = away['team_color'].iloc[0]
+        away_color2 = away['team_alternate_color'].iloc[0]
+        if home['team_color'].isna().all():
+            home_color = 'black'
+        else:
+            home_color = '#' + home_color
+        if away['team_color'].isna().all():
+            away_color = 'gray'
+        else:
+            away_color = '#' + away_color
+        if home['team_alternate_color'].isna().all():
+            home_color2 = 'black'
+        else:
+            home_color2 = '#' + home_color2
+        if away['team_alternate_color'].isna().all():
+            away_color2 = 'gray'
+        else:
+            away_color2 = '#' + away_color2
     
     
         # create single selection option
@@ -340,8 +364,6 @@ if selected_season:
             game_shots_df = game_shots_df[(game_shots_df['clock.minutes'] >= timemin) & (game_shots_df['clock.minutes'] <= timemax)]
         if Make:
             game_shots_df = game_shots_df[game_shots_df['scoringPlay'] == rmakemiss]
-        home_color = schedule_df['home_color']
-        away_color = schedule_df['away_color']
         # st.title(game_text)
     
         color_mapping = {
@@ -384,7 +406,7 @@ if selected_season:
             game_coords_df = pd.concat([game_coords_df, shot_df])
     
         # draw shot paths
-        color_map={'home':'blue','away':'red'}
+        color_map={'home':home_color2,'away':away_color2}
     
         shot_path_fig = px.line_3d(
             data_frame=game_coords_df,
@@ -406,7 +428,7 @@ if selected_season:
         # shot start scatter plots
         game_coords_start = game_coords_df[game_coords_df['shot_coord_index'] == 0]
         symbol_map={'made': 'circle-open', 'missed': 'cross'}
-        color_map={'home':'blue','away':'red'}
+        color_map={'home':home_color,'away':away_color}
         shot_start_fig = px.scatter_3d(
             data_frame=game_coords_start,
             x='x',
