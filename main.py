@@ -237,7 +237,7 @@ if selected_season:
 
         result = games[:last_hyphen_index].strip()
         st.markdown(f'<h3 style="color: gray;text-align:center;">{result}</h3>', unsafe_allow_html=True)
-        st.markdown(f'<h3 style="color: gray;text-align:center;">{row['home_display_name']}: {row['home_score']} {row['away_display_name']}: {row['away_score']}</h3>', unsafe_allow_html=True)
+        st.markdown(f'<h3 style="color: gray;text-align:center;">{row["home_display_name"]}: {row["home_score"]} {row["away_display_name"]}: {row["away_score"]}</h3>', unsafe_allow_html=True)
 
         # st.markdown(f'<h3 style="color: gray;text-align:center;">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]} vs {df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}</h3>', unsafe_allow_html=True)
         st.subheader('')
