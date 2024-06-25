@@ -376,7 +376,9 @@ if selected_season:
                 shot_id=row['sequenceNumber'],
                 play_description=row['text'],
                 shot_made=row['scoringPlay'],
-                team=row['team'])
+                team=row['team'],
+                quarter=row['period.displayValue'],
+                time=row['clock.displayValue'])
                 # quarter=row['period.displayValue'])
             shot_df = shot.get_shot_path_coordinates()
             game_coords_df = pd.concat([game_coords_df, shot_df])
@@ -392,11 +394,13 @@ if selected_season:
             line_group='line_id',
             color='team',
             color_discrete_map=color_map,
-            custom_data=['description','z']
+            custom_data=['description', 'z','quarter','time']
         )
     
-        hovertemplate= '%{customdata[0]}<br>Height: %{customdata[1]} ft'
-        hovertemplate2 = ' %{customdata[0]}'
+        hovertemplate= '%{customdata[0]}<br>%{customdata[2]} - %{customdata[3]}<br>Height: %{customdata[1]} ft'
+
+
+        hovertemplate2 = '%{customdata[0]}<br>%{customdata[2]} - %{customdata[3]}'
         shot_path_fig.update_traces(opacity=0.55, hovertemplate=hovertemplate, showlegend=False)
     
         # shot start scatter plots
@@ -408,7 +412,7 @@ if selected_season:
             x='x',
             y='y',
             z='z',
-            custom_data=['description'],
+            custom_data=['description', 'z','quarter','time'],
             color='team',
             color_discrete_map=color_map,
             # color_discrete_map=color_mapping,
