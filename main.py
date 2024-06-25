@@ -527,13 +527,15 @@ if selected_season:
     
             for index, row in filtered_shot_df.iterrows():
                 shot = BasketballShot(
-                    shot_start_x=row['coordinate.x'],
-                    shot_start_y=row['coordinate.y'],
+                    shot_start_x=row['coordinate.x'], 
+                    shot_start_y=row['coordinate.y'], 
                     shot_id=row['sequenceNumber'],
                     play_description=row['text'],
                     shot_made=row['scoringPlay'],
-                    team=row['team']
-                )
+                    team=row['team'],
+                    quarter=row['period.displayValue'],
+                    time=row['clock.displayValue'])
+                
                 shot_df = shot.get_shot_path_coordinates()
     
                 # Determine color and symbol based on shot made or missed
@@ -553,8 +555,8 @@ if selected_season:
                         line=dict(width=0)
                     ),
                     hoverinfo='text',
-                    hovertemplate="<b>%{customdata}</b><extra></extra>",
-                    customdata=shot_df['description'],
+                    hovertemplate = '%{customdata[0]}<br>%{customdata[2]} - %{customdata[3]}',
+                    custom_data=['description', 'z','quarter','time'],
                     showlegend=False
                 )
     
