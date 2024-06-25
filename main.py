@@ -514,6 +514,9 @@ if selected_season:
                     shot_df = shot_df[shot_df['scoreValue'] == int(points)]
                 if Time:
                     shot_df = shot_df[(shot_df['clock.minutes'] >= timemin) & (shot_df['clock.minutes'] <= timemax)]
+                if Make:
+                    shot_df = shot_df[shot_df['scoringPlay'] == rmakemiss]
+
     
                 # Determine color and symbol based on shot made or missed
                 if row['scoringPlay']:
