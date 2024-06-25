@@ -444,6 +444,7 @@ if selected_season:
         play = st.sidebar.button('Play by play')
         if play:
             speed = st.slider('Select speed', 0, 5, 2)
+            start = st.button('Start)
 
                 # Draw basketball court lines
             court = CourtCoordinates()
@@ -507,60 +508,60 @@ if selected_season:
             message2 = st.empty()
             message3 = st.empty()
             messages = []
-    
-            for index, row in filtered_shot_df.iterrows():
-                shot = BasketballShot(
-                    shot_start_x=row['coordinate.x'],
-                    shot_start_y=row['coordinate.y'],
-                    shot_id=row['sequenceNumber'],
-                    play_description=row['text'],
-                    shot_made=row['scoringPlay'],
-                    team=row['team']
-                )
-                shot_df = shot.get_shot_path_coordinates()
-    
-                # Determine color and symbol based on shot made or missed
-                marker_color = 'blue' if row['team'] == 'home' else 'red'
-                marker_symbol = 'circle-open' if row['scoringPlay'] else 'x'
-    
-                # Create a trace for this shot
-                trace = go.Scatter3d(
-                    x=shot_df['x'],
-                    y=shot_df['y'],
-                    z=shot_df['z'],
-                    mode='markers',
-                    marker=dict(
-                        size=4,
-                        color=marker_color,
-                        symbol=marker_symbol,
-                        line=dict(width=0)
-                    ),
-                    hoverinfo='text',
-                    hovertemplate="<b>%{customdata}</b><extra></extra>",
-                    customdata=shot_df['description'],
-                    showlegend=False
-                )
-    
-                # Append the trace to the list
-                # traces.append(trace)
-    
-                # Update the plot with the new trace
-                fig.add_trace(trace)
-                message = row['text']
+            if start:
+                for index, row in filtered_shot_df.iterrows():
+                    shot = BasketballShot(
+                        shot_start_x=row['coordinate.x'],
+                        shot_start_y=row['coordinate.y'],
+                        shot_id=row['sequenceNumber'],
+                        play_description=row['text'],
+                        shot_made=row['scoringPlay'],
+                        team=row['team']
+                    )
+                    shot_df = shot.get_shot_path_coordinates()
+        
+                    # Determine color and symbol based on shot made or missed
+                    marker_color = 'blue' if row['team'] == 'home' else 'red'
+                    marker_symbol = 'circle-open' if row['scoringPlay'] else 'x'
+        
+                    # Create a trace for this shot
+                    trace = go.Scatter3d(
+                        x=shot_df['x'],
+                        y=shot_df['y'],
+                        z=shot_df['z'],
+                        mode='markers',
+                        marker=dict(
+                            size=4,
+                            color=marker_color,
+                            symbol=marker_symbol,
+                            line=dict(width=0)
+                        ),
+                        hoverinfo='text',
+                        hovertemplate="<b>%{customdata}</b><extra></extra>",
+                        customdata=shot_df['description'],
+                        showlegend=False
+                    )
+        
+                    # Append the trace to the list
+                    # traces.append(trace)
+        
+                    # Update the plot with the new trace
+                    fig.add_trace(trace)
+                    message = row['text']
+                    placeholder.plotly_chart(fig, use_container_width=True)
+                    message_placeholder.text(message)
+                    if message == None:
+                        st.text('')
+                    else:
+                        message_placeholder.text(f'Latest shot: {message}')
+        
+                    time.sleep(speed)
+        
+                    # Remove the trace from the figure to avoid clutter (optional, if needed)
+                    # fig.data.remove(trace)
+        
+                # Final update of the placeholder with the fully rendered figure
                 placeholder.plotly_chart(fig, use_container_width=True)
-                message_placeholder.text(message)
-                if message == None:
-                    st.text('')
-                else:
-                    message_placeholder.text(f'Latest shot: {message}')
-    
-                time.sleep(speed)
-    
-                # Remove the trace from the figure to avoid clutter (optional, if needed)
-                # fig.data.remove(trace)
-    
-            # Final update of the placeholder with the fully rendered figure
-            placeholder.plotly_chart(fig, use_container_width=True)
             if normalplot:
                 st.plotly_chart(fig, use_container_width=True)
         else:
