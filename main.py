@@ -10,6 +10,20 @@ import pandas as pd
 from sportsdataverse.nba.nba_pbp import espn_nba_pbp
 import plotly.graph_objects as go  # Import Plotly graph objects separately
 import time
+import re
+
+def extract_number_from_string(s):
+    # Regular expression pattern to find a number in the string
+    pattern = r'\b\d+\b'
+    
+    # Using re.findall to get all numbers matching the pattern
+    numbers = re.findall(pattern, s)
+    
+    # If numbers list is not empty, return the first number found (as a string)
+    if numbers:
+        return int(numbers[0])  # Convert the first number to an integer
+    else:
+        return 0  # Return 0 if no numbers were found
 
 def fetch_and_save_nba_pbp(game_id, output_file):
     try:
@@ -182,9 +196,8 @@ if selected_season:
         df['away_color'] = '99bfe5'
         df = df[df['shootingPlay'] == True]
         df = df[~df['type.text'].str.contains('free throw', case=False, na=False)]
-        df['Shot Distance'] = ((df['coordinate.x'] - 25).pow(2) +
-                           (df['coordinate.y'] - df.apply(lambda row: 89.75 if row['team'] == 'away' else 4.25, axis=1)).pow(2)).pow(0.5)
-        df.loc[df['team'] == 'away', 'Shot Distance'] = abs(df.loc[df['team'] == 'away', 'Shot Distance'] - 94)
+        df['Shot Distance'] = df['text'].apply(extract_number_from_string)
+
     
     
     
