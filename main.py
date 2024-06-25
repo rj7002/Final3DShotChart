@@ -141,7 +141,6 @@ if selected_season:
         elif selected_season <= 2003 and pd.isna(typegame):
             typegame = ''
         game = f"{row['home_display_name']} vs {row['away_display_name']} - {typegame} - {formatted_date2} - {row['game_id']}"
-        index = i
         # Append the concatenated string to the games list
         games.append(game)# Create a selectbox in Streamlit
     games = st.selectbox('Select game', [''] + games)
@@ -238,8 +237,6 @@ if selected_season:
 
         result = games[:last_hyphen_index].strip()
         st.markdown(f'<h3 style="color: gray;text-align:center;">{result}</h3>', unsafe_allow_html=True)
-        st.markdown(f'<h3 style="color: gray;text-align:center;">{row[i]["home_display_name"]}: {row[i]["home_score"]} {row[i]["away_display_name"]}: {row[i]["away_score"]}</h3>', unsafe_allow_html=True)
-
         # st.markdown(f'<h3 style="color: gray;text-align:center;">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]} vs {df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}</h3>', unsafe_allow_html=True)
         st.subheader('')
         hometeam = df['homeTeamName'].iloc[0] + " " + df['homeTeamMascot'].iloc[0]
