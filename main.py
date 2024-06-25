@@ -568,6 +568,7 @@ if selected_season:
                 message = row['text']
                 message2 = row['period.displayValue']
                 message3 = row['clock.displayValue']
+                messages.append(f'{message} - {message2}: {message3}')
                 placeholder.plotly_chart(fig, use_container_width=True)
                 message_placeholder.text(message)
                 if message == None:
@@ -582,6 +583,9 @@ if selected_season:
     
             # Final update of the placeholder with the fully rendered figure
             placeholder.plotly_chart(fig, use_container_width=True)
+            with st.expander('All Shots'):
+                for msg in messages:
+                    st.text(msg)
             if normalplot:
                 st.plotly_chart(fig, use_container_width=True)
         else:
