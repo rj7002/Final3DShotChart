@@ -440,9 +440,10 @@ if selected_season:
             ),
             legend_traceorder="reversed"
         )
+        normalplot = st.sidebar.button('Normal Plot')
         play = st.sidebar.button('Play by play')
         if play:
-                    # Draw basketball court lines
+                # Draw basketball court lines
             court = CourtCoordinates()
             court_lines_df = court.get_court_lines()
     
@@ -459,9 +460,9 @@ if selected_season:
                 }
             )
             fig.update_traces(hovertemplate=None, hoverinfo='skip', showlegend=False)
-    
-                # graph styling
             fig.update_traces(line=dict(width=5))
+    
+            # Apply layout settings
             fig.update_layout(    
                 margin=dict(l=20, r=20, t=20, b=20),
                 scene_aspectmode="data",
@@ -472,27 +473,40 @@ if selected_season:
                 scene=dict(
                     xaxis=dict(title='', showticklabels=False, showgrid=False),
                     yaxis=dict(title='', showticklabels=False, showgrid=False),
-                    zaxis=dict(title='',  showticklabels=False, showgrid=False, showbackground=True, backgroundcolor='#D2B48C'),
-                ),
-                # legend=dict(
-                #     yanchor='top',
-                #     y=0.05,
-                #     x=0.2,
-                #     xanchor='left',
-                #     orientation='h',
-                #     font=dict(size=15, color='gray'),
-                #     bgcolor='rgba(0, 0, 0, 0)',
-                #     title='',
-                #     itemsizing='constant'
-                # ),
-                # legend_traceorder="reversed"
+                    zaxis=dict(title='', showticklabels=False, showgrid=False, showbackground=True, backgroundcolor='#D2B48C'),
+                )
             )
+    
             # Create a Streamlit placeholder for the plot
             placeholder = st.empty()
     
-            # Iterate through each row in the DataFrame to add scatter points one by one
-            for index, row in df.iterrows():
-                # Assuming you have a utility to get shot path coordinates
+            # Prepare data filters
+            filters = {
+                'period.displayValue': quart if Quarter else None,
+                'Shot Distance': (shotdistance_min, shotdistance_max) if Shotdist else None,
+                'text': players if Player else None,
+                'type.text': finaltype if Shottype else None,
+                'scoreValue': int(points) if Points else None,
+                'clock.minutes': (timemin, timemax) if Time else None
+            }
+    
+            filtered_shot_df = df.copy()
+    
+            for key, value in filters.items():
+                if value is not None:
+                    if isinstance(value, tuple):
+                        filtered_shot_df = filtered_shot_df[(filtered_shot_df[key] >= value[0]) & (filtered_shot_df[key] <= value[1])]
+                    else:
+                        filtered_shot_df = filtered_shot_df[filtered_shot_df[key].isin(value)]
+    
+            # Initialize an empty list to store trace objects
+            traces = []
+            message_placeholder = st.empty()
+            message2 = st.empty()
+            message3 = st.empty()
+            messages = []
+    
+            for index, row in filtered_shot_df.iterrows():
                 shot = BasketballShot(
                     shot_start_x=row['coordinate.x'],
                     shot_start_y=row['coordinate.y'],
@@ -502,67 +516,51 @@ if selected_season:
                     team=row['team']
                 )
                 shot_df = shot.get_shot_path_coordinates()
-                if Quarter:
-                    shot_df = shot_df[shot_df['period.displayValue'].isin(quart)]
-                if Shotdist:
-                    shot_df = shot_df[(shot_df['Shot Distance'] >= shotdistance_min) & (shot_df['Shot Distance'] <= shotdistance_max)]
-                if Player:
-                    shot_df = shot_df[shot_df['description'].str.contains('|'.join(players), case=False, na=False)]
-                if Shottype:
-                    shot_df = shot_df[shot_df['type.text'].isin(finaltype)]
-                if Points:
-                    shot_df = shot_df[shot_df['scoreValue'] == int(points)]
-                if Time:
-                    shot_df = shot_df[(shot_df['clock.minutes'] >= timemin) & (shot_df['clock.minutes'] <= timemax)]
-                if Make:
-                    if rmakemiss == True:
-                        imakemiss = 'made'
-                    elif rmakemiss == False:
-                        imakemiss = 'missed'
-                    shot_df = shot_df[shot_df['shot_made'] == imakemiss]
-
     
                 # Determine color and symbol based on shot made or missed
-                if row['scoringPlay']:
-                    marker_color = 'blue' if row['team'] == 'home' else 'red'
-                    marker_symbol = 'circle-open'
+                marker_color = 'blue' if row['team'] == 'home' else 'red'
+                marker_symbol = 'circle-open' if row['scoringPlay'] else 'x'
+    
+                # Create a trace for this shot
+                trace = go.Scatter3d(
+                    x=shot_df['x'],
+                    y=shot_df['y'],
+                    z=shot_df['z'],
+                    mode='markers',
+                    marker=dict(
+                        size=4,
+                        color=marker_color,
+                        symbol=marker_symbol,
+                        line=dict(width=0)
+                    ),
+                    hoverinfo='text',
+                    hovertemplate="<b>%{customdata}</b><extra></extra>",
+                    customdata=shot_df['description'],
+                    showlegend=False
+                )
+    
+                # Append the trace to the list
+                # traces.append(trace)
+    
+                # Update the plot with the new trace
+                fig.add_trace(trace)
+                message = row['text']
+                placeholder.plotly_chart(fig, use_container_width=True)
+                message_placeholder.text(message)
+                if message == None:
+                    st.text('')
                 else:
-                    marker_color = 'blue' if row['team'] == 'home' else 'red'
-                    marker_symbol = 'x'
+                    message_placeholder.text(f'Latest shot: {message}')
     
-                # Add each point one by one to the figure
-                text_all = (
-    )
-                hover_template = (
-                "<b>%{customdata[0]}<br>")
-                shot_df['text'] = shot_df['description']
-                
-                for _, shot_row in shot_df.iterrows():
-                    fig.add_trace(
-                        go.Scatter3d(
-                            x=[shot_row['x']],
-                            y=[shot_row['y']],
-                            z=[shot_row['z']],
-                            mode='markers',
-                            marker=dict(
-                                size=4,
-                                color=marker_color,
-                                symbol=marker_symbol,
-                                line=dict(width=0)
-                            ),
-                            hoverinfo='text',
-                            hovertemplate="<b>%{customdata}</b><extra></extra>",
-                            customdata=[shot_row['description']],
-                             showlegend=False
-                        )
-                    )
+                time.sleep(3)
     
-                    # Update the placeholder with the updated figure
-                    placeholder.plotly_chart(fig, use_container_width=True)
-                    time.sleep(0.02)
+                # Remove the trace from the figure to avoid clutter (optional, if needed)
+                # fig.data.remove(trace)
     
             # Final update of the placeholder with the fully rendered figure
             placeholder.plotly_chart(fig, use_container_width=True)
+            if normalplot:
+                st.plotly_chart(fig, use_container_width=True)
         else:
             st.plotly_chart(fig, use_container_width=True)
     
