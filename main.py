@@ -378,10 +378,11 @@ if selected_season:
             line_group='line_id',
             color='team',
             color_discrete_map=color_map,
-            custom_data=['description']
+            custom_data=['description','z']
         )
     
-        hovertemplate=' %{customdata[0]}'
+        hovertemplate= '%{customdata[0]}<br>Height: %{customdata[1]} ft'
+        hovertemplate2 = ' %{customdata[0]}'
         shot_path_fig.update_traces(opacity=0.55, hovertemplate=hovertemplate, showlegend=False)
     
         # shot start scatter plots
@@ -403,7 +404,7 @@ if selected_season:
             symbol_map=symbol_map
         )
     
-        shot_start_fig.update_traces(marker_size=7, hovertemplate=hovertemplate)
+        shot_start_fig.update_traces(marker_size=7, hovertemplate=hovertemplate2)
     
         # add shot scatter plot to court plot
         for i in range(len(shot_start_fig.data)):
