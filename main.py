@@ -561,7 +561,7 @@ if selected_season:
                 shot_df = shot.get_shot_path_coordinates()
     
                 # Determine color and symbol based on shot made or missed
-                marker_color = 'blue' if row['team'] == 'home' else 'red'
+                marker_color = home_color2 if row['team'] == 'home' else away_color2
                 marker_symbol = 'circle-open' if row['scoringPlay'] else 'x'
     
                 # Create a trace for this shot
