@@ -566,12 +566,14 @@ if selected_season:
                 # Update the plot with the new trace
                 fig.add_trace(trace)
                 message = row['text']
+                message2 = row['period.displayValue']
+                message3 = row['clock.displayValue']
                 placeholder.plotly_chart(fig, use_container_width=True)
                 message_placeholder.text(message)
                 if message == None:
                     st.text('')
                 else:
-                    message_placeholder.text(f'Latest shot: {message}')
+                    message_placeholder.text(f'Latest shot: {message} - {message2}: {message3}')
     
                 time.sleep(3)
     
