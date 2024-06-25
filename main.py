@@ -189,8 +189,8 @@ if selected_season:
     
     
         df.to_csv(output_csv, index=False)
-        Make/Miss = st.sidebar.toggle('Make/Miss')
-        if Make/Miss == 1:
+        Make = st.sidebar.toggle('Make/Miss')
+        if Make == 1:
             makemiss = st.sidebar.selectbox('',['Make','Miss'])
             if makemiss == 'Make':
                 rmakemiss = True
@@ -324,7 +324,7 @@ if selected_season:
             game_shots_df = game_shots_df[game_shots_df['scoreValue'] == int(points)]
         if Time:
             game_shots_df = game_shots_df[(game_shots_df['clock.minutes'] >= timemin) & (game_shots_df['clock.minutes'] <= timemax)]
-        if Make/Miss:
+        if Make:
             game_shots_df = game_shots_df[game_shots_df['scoringPlay'] == rmakemiss]
         home_color = schedule_df['home_color']
         away_color = schedule_df['away_color']
