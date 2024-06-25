@@ -515,6 +515,7 @@ if selected_season:
                 if Time:
                     shot_df = shot_df[(shot_df['clock.minutes'] >= timemin) & (shot_df['clock.minutes'] <= timemax)]
                 if Make:
+                    st.write(shot_df)
                     shot_df = shot_df[shot_df['shot_made'] == rmakemiss]
 
     
