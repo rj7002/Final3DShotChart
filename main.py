@@ -543,7 +543,7 @@ if selected_season:
                 marker_symbol = 'circle-open' if row['scoringPlay'] else 'x'
     
                 # Create a trace for this shot
-                trace = go.Scatter3d(
+               trace = go.Scatter3d(
                     x=shot_df['x'],
                     y=shot_df['y'],
                     z=shot_df['z'],
@@ -555,8 +555,8 @@ if selected_season:
                         line=dict(width=0)
                     ),
                     hoverinfo='text',
-                    customdata=['description', 'z','quarter','time'],
-                    hovertemplate = '%{customdata[0]}<br>%{customdata[2]} - %{customdata[3]}',
+                    customdata=list(zip(shot_df['description'], shot_df['z'], shot_df['quarter'], shot_df['time'])),
+                    hovertemplate='%{customdata[0]}<br>%{customdata[2]} - %{customdata[3]}',
                     showlegend=False
                 )
                 # fig.update_traces(hovertemplate=hovertemplate)
