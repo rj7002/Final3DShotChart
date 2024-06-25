@@ -555,11 +555,11 @@ if selected_season:
                         line=dict(width=0)
                     ),
                     hoverinfo='text',
-                    hovertemplate = '%{customdata[0]}<br>%{customdata[2]} - %{customdata[3]}',
                     customdata=['description', 'z','quarter','time'],
+                    hovertemplate = '%{customdata[0]}<br>%{customdata[2]} - %{customdata[3]}',
                     showlegend=False
                 )
-    
+                # fig.update_traces(hovertemplate=hovertemplate)
                 # Append the trace to the list
                 # traces.append(trace)
     
