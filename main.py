@@ -443,6 +443,8 @@ if selected_season:
         normalplot = st.sidebar.button('Normal Plot')
         play = st.sidebar.button('Play by play')
         if play:
+            speed = st.slider('Select speed', 0, 5, 2)
+
                 # Draw basketball court lines
             court = CourtCoordinates()
             court_lines_df = court.get_court_lines()
@@ -552,7 +554,7 @@ if selected_season:
                 else:
                     message_placeholder.text(f'Latest shot: {message}')
     
-                time.sleep(3)
+                time.sleep(speed)
     
                 # Remove the trace from the figure to avoid clutter (optional, if needed)
                 # fig.data.remove(trace)
