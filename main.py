@@ -444,7 +444,7 @@ if selected_season:
         play = st.sidebar.button('Play by play')
         if play:
             speed = st.slider('Select speed', 0, 5, 2)
-            start = st.button('Start)
+            start = st.button('Start')
 
                 # Draw basketball court lines
             court = CourtCoordinates()
