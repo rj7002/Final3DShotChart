@@ -556,7 +556,7 @@ if selected_season:
                     ),
                     hoverinfo='text',
                     hovertemplate = '%{customdata[0]}<br>%{customdata[2]} - %{customdata[3]}',
-                    custom_data=['description', 'z','quarter','time'],
+                    customdata=['description', 'z','quarter','time'],
                     showlegend=False
                 )
     
