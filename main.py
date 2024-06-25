@@ -562,8 +562,8 @@ if selected_season:
         
                 # Final update of the placeholder with the fully rendered figure
                 placeholder.plotly_chart(fig, use_container_width=True)
-            if normalplot:
-                st.plotly_chart(fig, use_container_width=True)
+                if normalplot:
+                    st.plotly_chart(fig, use_container_width=True)
         else:
             st.plotly_chart(fig, use_container_width=True)
     
