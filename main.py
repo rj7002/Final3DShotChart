@@ -155,7 +155,7 @@ if selected_season:
             typegame = 'Regular Season' 
         elif selected_season <= 2003 and pd.isna(typegame):
             typegame = ''
-        game = f"{row['home_display_name']} vs {row['away_display_name']} - {typegame} - {formatted_date2} - {row['game_id']}"
+        game = f"{row['away_display_name']} @ {row['home_display_name']} - {typegame} - {formatted_date2} - {row['game_id']}"
         # Append the concatenated string to the games list
         games.append(game)# Create a selectbox in Streamlit
     games = st.selectbox('Select game', [''] + games)
@@ -259,9 +259,9 @@ if selected_season:
         awayabbrev = map_team_to_abbreviation(awayteam)
         col1, col2 = st.columns(2)
         with col1:
-            display_team_image(homeabbrev,300)
-        with col2:
             display_team_image(awayabbrev,300)
+        with col2:
+            display_team_image(homeabbrev,300)
     
     
         # # create a connection
@@ -320,25 +320,25 @@ if selected_season:
         nba_teams_df = nba.espn_nba_teams(return_as_pandas=True)
         home = nba_teams_df[nba_teams_df['team_display_name'] == hometeam]
         away = nba_teams_df[nba_teams_df['team_display_name'] == awayteam]
-        home_color = home['team_color'].iloc[0]
-        home_color2 = home['team_alternate_color'].iloc[0]
-        away_color = away['team_color'].iloc[0]
-        away_color2 = away['team_alternate_color'].iloc[0]
         if home['team_color'].isna().all():
             home_color = 'black'
         else:
+            home_color = home['team_color'].iloc[0]
             home_color = '#' + home_color
         if away['team_color'].isna().all():
             away_color = 'gray'
         else:
+            away_color = away['team_color'].iloc[0]
             away_color = '#' + away_color
         if home['team_alternate_color'].isna().all():
             home_color2 = 'black'
         else:
+            home_color2 = home['team_alternate_color'].iloc[0]
             home_color2 = '#' + home_color2
         if away['team_alternate_color'].isna().all():
             away_color2 = 'gray'
         else:
+            away_color2 = away['team_alternate_color'].iloc[0]
             away_color2 = '#' + away_color2
     
     
