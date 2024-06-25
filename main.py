@@ -517,7 +517,7 @@ if selected_season:
                 if Make:
                     if rmakemiss == True:
                         imakemiss = 'made'
-                    else if rmakemiss == False:
+                    elif rmakemiss == False:
                         imakemiss = 'missed'
                     shot_df = shot_df[shot_df['shot_made'] == imakemiss]
 
