@@ -543,7 +543,7 @@ if selected_season:
                 marker_symbol = 'circle-open' if row['scoringPlay'] else 'x'
     
                 # Create a trace for this shot
-               trace = go.Scatter3d(
+                trace = go.Scatter3d(
                     x=shot_df['x'],
                     y=shot_df['y'],
                     z=shot_df['z'],
