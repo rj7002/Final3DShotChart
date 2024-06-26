@@ -406,7 +406,7 @@ if selected_season:
             game_coords_df = pd.concat([game_coords_df, shot_df])
     
         # draw shot paths
-        color_map={'away':away_color2,'home':home_color2}
+        color_map={'away':away_color,'home':home_color2}
     
         shot_path_fig = px.line_3d(
             data_frame=game_coords_df,
@@ -428,7 +428,7 @@ if selected_season:
         # shot start scatter plots
         game_coords_start = game_coords_df[game_coords_df['shot_coord_index'] == 0]
         symbol_map={'made': 'circle-open', 'missed': 'cross'}
-        color_map={'away':away_color,'home':home_color}
+        color_map={'away':away_color2,'home':home_color}
         shot_start_fig = px.scatter_3d(
             data_frame=game_coords_start,
             x='x',
@@ -571,7 +571,7 @@ if selected_season:
                 game_coords_df = pd.concat([game_coords_df, shot_df])
     
                 # Draw shot paths
-                color_map = {'home': home_color2, 'away': away_color2}
+                color_map = {'home': home_color2, 'away': away_color}
                 shot_path_fig = px.line_3d(
                     data_frame=game_coords_df,
                     x='x',
@@ -589,7 +589,7 @@ if selected_season:
                 # Draw shot start scatter plots
                 game_coords_start = game_coords_df[game_coords_df['shot_coord_index'] == 0]
                 symbol_map = {'made': 'circle-open', 'missed': 'cross'}
-                color_map = {'home': home_color, 'away': away_color}
+                color_map = {'home': home_color, 'away': away_color2}
                 shot_start_fig = px.scatter_3d(
                     data_frame=game_coords_start,
                     x='x',
