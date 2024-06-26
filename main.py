@@ -483,8 +483,9 @@ if selected_season:
         )
         normalplot = st.sidebar.button('Normal Plot')
         play = st.sidebar.button('Play by play')
+        
         if play:
-                # Draw basketball court lines
+            # Draw basketball court lines
             court = CourtCoordinates()
             court_lines_df = court.get_court_lines()
     
@@ -547,7 +548,16 @@ if selected_season:
             message3 = st.empty()
             messages = []
     
-            for index, row in filtered_shot_df.iterrows():
+            game_coords_df = pd.DataFrame()  # Initialize empty DataFrame to store all shot coordinates
+    
+            traces = []
+            message_placeholder = st.empty()
+            message2 = st.empty()
+            message3 = st.empty()
+            messages = []
+            
+            for index, row in game_shots_df.iterrows():
+                # Assuming BasketballShot class or function to generate shot coordinates
                 shot = BasketballShot(
                     shot_start_x=row['coordinate.x'], 
                     shot_start_y=row['coordinate.y'], 
@@ -559,35 +569,54 @@ if selected_season:
                     time=row['clock.displayValue'])
                 
                 shot_df = shot.get_shot_path_coordinates()
+                game_coords_df = pd.concat([game_coords_df, shot_df])
     
-                # Determine color and symbol based on shot made or missed
-                marker_color = home_color2 if row['team'] == 'home' else away_color2
-                marker_symbol = 'circle-open' if row['scoringPlay'] else 'x'
-    
-                # Create a trace for this shot
-                trace = go.Scatter3d(
-                    x=shot_df['x'],
-                    y=shot_df['y'],
-                    z=shot_df['z'],
-                    mode='markers',
-                    marker=dict(
-                        size=4,
-                        color=marker_color,
-                        symbol=marker_symbol,
-                        line=dict(width=0)
-                    ),
-                    hoverinfo='text',
-                    customdata=list(zip(shot_df['description'], shot_df['z'], shot_df['quarter'], shot_df['time'])),
-                    hovertemplate='%{customdata[0]}<br>%{customdata[2]} - %{customdata[3]}',
-                    showlegend=False
+                # Draw shot paths
+                color_map = {'home': home_color2, 'away': away_color2}
+                shot_path_fig = px.line_3d(
+                    data_frame=game_coords_df,
+                    x='x',
+                    y='y',
+                    z='z',
+                    line_group='line_id',
+                    color='team',
+                    color_discrete_map=color_map,
+                    custom_data=['description', 'z', 'quarter', 'time']
                 )
-                # fig.update_traces(hovertemplate=hovertemplate)
-                # Append the trace to the list
-                # traces.append(trace)
     
-                # Update the plot with the new trace
+                hovertemplate = '%{customdata[0]}<br>%{customdata[2]} - %{customdata[3]}'
+                shot_path_fig.update_traces(opacity=0.55, hovertemplate=hovertemplate, showlegend=False)
+    
+                # Draw shot start scatter plots
+                game_coords_start = game_coords_df[game_coords_df['shot_coord_index'] == 0]
+                symbol_map = {'made': 'circle-open', 'missed': 'cross'}
+                color_map = {'home': home_color, 'away': away_color}
+                shot_start_fig = px.scatter_3d(
+                    data_frame=game_coords_start,
+                    x='x',
+                    y='y',
+                    z='z',
+                    custom_data=['description', 'z', 'quarter', 'time'],
+                    color='team',
+                    color_discrete_map=color_map,
+                    symbol='shot_made',
+                    symbol_map=symbol_map,
+                )
+    
+                shot_start_fig.update_traces(marker_size=7, hovertemplate=hovertemplate,showlegend=False)
+    
+                # Add shot scatter plot to the existing figure
                 
-                fig.add_trace(trace)
+    
+                for trace in shot_start_fig.data:
+                    fig.add_trace(trace)
+    
+                # Add shot line plot to the existing figure
+                for trace in shot_path_fig.data:
+                    fig.add_trace(trace)
+    
+                # Update layout and display the figure dynamically
+                fig.update_traces(line=dict(width=5))
                 message = row['text']
                 message2 = row['period.displayValue']
                 message3 = row['clock.displayValue']
@@ -602,19 +631,14 @@ if selected_season:
                     st.text('')
                 else:
                     message_placeholder.text(f'Latest shot: {message} - {message2}: {message3}')
-    
                 time.sleep(3)
-    
-                # Remove the trace from the figure to avoid clutter (optional, if needed)
-                # fig.data.remove(trace)
-    
-            # Final update of the placeholder with the fully rendered figure
             placeholder.plotly_chart(fig, use_container_width=True)
             with st.expander('All Shots'):
                 for msg in messages:
                     st.text(msg)
             if normalplot:
-                st.plotly_chart(fig, use_container_width=True)
+                    st.plotly_chart(fig, use_container_width=True)
+
         else:
             st.plotly_chart(fig, use_container_width=True)
     
