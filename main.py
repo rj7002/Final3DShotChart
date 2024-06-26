@@ -237,7 +237,6 @@ if selected_season:
         Shottype = st.sidebar.toggle('Shot Type')
         if Shottype == 1:
             shottype = st.sidebar.multiselect('',uniqueshots)
-            st.write(uniqueshots)
         Points = st.sidebar.toggle('Points')
         if Points == 1:
             points = st.sidebar.selectbox('',['2','3'])
@@ -361,7 +360,7 @@ if selected_season:
         if Player:
              game_shots_df = game_shots_df[game_shots_df['text'].str.contains('|'.join(player_names), case=False, na=False)]
         if Shottype:
-            game_shots_df = game_shots_df[game_shots_df['type.text'].isin(uniqueshots)]
+            game_shots_df = game_shots_df[game_shots_df['type.text'].isin(shottype)]
         if Points:
             game_shots_df = game_shots_df[game_shots_df['scoreValue'] == int(points)]
         if Time:
