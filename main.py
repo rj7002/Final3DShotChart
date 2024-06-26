@@ -412,12 +412,12 @@ if selected_season:
         for index, row in game_shots_df.iterrows():
             if row['team.id'] == team_id:
                 hometotal+=1
-            if row['scoringPlay'] == True:
-                homecount+=1
+                if row['scoringPlay'] == True:
+                    homecount+=1
             elif row['team.id'] != team_id:
                 awaytotal+=1
-            if row['scoringPlay'] == True:
-                awaycount+=1
+                if row['scoringPlay'] == True:
+                    awaycount+=1
             shot = BasketballShot(
                 shot_start_x=row['coordinate.x'], 
                 shot_start_y=row['coordinate.y'], 
