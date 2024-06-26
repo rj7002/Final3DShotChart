@@ -117,7 +117,7 @@ st.set_page_config(page_title="3D NBA Shot Visualizer", page_icon='https://i.img
 st.markdown(f'<h3 style="color: gray; text-align: center; font-size: 100px;">3D NBA Shot Visualizer</h3>', unsafe_allow_html=True)
 
 st.sidebar.markdown('<div style="text-align: center;"><span style="font-size:30px;">3D NBA Shot Visualizer</span></div>', unsafe_allow_html=True)
-st.sidebar.subheader('')
+st.sidebar.image("https://i.imgur.com/3oGJTcf.png")
 
 input_csv = 'nba_play_by_play.csv'  # Replace with your actual CSV file path
 output_csv = 'nba_play_by_play.csv'  # Replace with desired output file path
