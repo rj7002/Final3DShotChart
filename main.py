@@ -13,6 +13,12 @@ import plotly.graph_objects as go  # Import Plotly graph objects separately
 import time
 import re
 
+def determine_shot_attempted(text):
+    if 'three point' in text.lower():
+        return 3
+    else:
+        return 2
+
 def extract_number_from_string(s):
     # Regular expression pattern to find a number in the string
     pattern = r'\b\d+\b'
@@ -198,6 +204,8 @@ if selected_season:
         df = df[df['shootingPlay'] == True]
         df = df[~df['type.text'].str.contains('free throw', case=False, na=False)]
         df['Shot Distance'] = df['text'].apply(extract_number_from_string)
+        df['Shot Attempted'] = df['text'].apply(determine_shot_attempted)
+
 
     
     
@@ -362,7 +370,7 @@ if selected_season:
         if Shottype:
             game_shots_df = game_shots_df[game_shots_df['type.text'].isin(shottype)]
         if Points:
-            game_shots_df = game_shots_df[game_shots_df['scoreValue'] == int(points)]
+            game_shots_df = game_shots_df[game_shots_df['Shot Attempted'] == int(points)]
         if Time:
             game_shots_df = game_shots_df[(game_shots_df['clock.minutes'] >= timemin) & (game_shots_df['clock.minutes'] <= timemax)]
         if Make:
@@ -549,12 +557,19 @@ if selected_season:
     
             filtered_shot_df = df.copy()
     
-            for key, value in filters.items():
-                if value is not None:
-                    if isinstance(value, tuple):
-                        filtered_shot_df = filtered_shot_df[(filtered_shot_df[key] >= value[0]) & (filtered_shot_df[key] <= value[1])]
-                    else:
-                        filtered_shot_df = filtered_shot_df[filtered_shot_df[key].isin(value)]
+            if Quarter:
+                filtered_shot_df = filtered_shot_df[filtered_shot_df['period.displayValue'].isin(quart)]
+            if Shotdist:
+                filtered_shot_df = filtered_shot_df[(filtered_shot_df['Shot Distance'] >= shotdistance_min) & (filtered_shot_df['Shot Distance'] <= shotdistance_max)]
+            if Player:
+                filtered_shot_df = filtered_shot_df[filtered_shot_df['text'].str.split('.').str[0].str.contains('|'.join(player_names), case=False, na=False)]
+            if Shottype:
+                filtered_shot_df = filtered_shot_df[filtered_shot_df['type.text'].isin(finaltype)]
+            if Points:
+                filtered_shot_df = filtered_shot_df[filtered_shot_df['Shot Attempted'] == int(points)]
+            if Time:
+                filtered_shot_df = filtered_shot_df[(filtered_shot_df['clock.minutes'] >= timemin) & (filtered_shot_df['clock.minutes'] <= timemax)]
+
     
             # Initialize an empty list to store trace objects
             traces = []
