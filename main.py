@@ -237,6 +237,7 @@ if selected_season:
         Shottype = st.sidebar.toggle('Shot Type')
         if Shottype == 1:
             shottype = st.sidebar.multiselect('',uniqueshots)
+            st.write(uniqueshots)
         Points = st.sidebar.toggle('Points')
         if Points == 1:
             points = st.sidebar.selectbox('',['2','3'])
