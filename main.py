@@ -14,6 +14,15 @@ import plotly.graph_objects as go  # Import Plotly graph objects separately
 import time
 import re
 
+def filter_player_actions(df, player_names):
+    # Combine player names into a single regex pattern
+    pattern = '|'.join([rf'{name}\s+(made|missed)' for name in player_names])
+    
+    # Apply the filter using regex matching
+    filtered_df = df[df['text'].str.contains(pattern, flags=re.IGNORECASE, regex=True)]
+    
+    return filtered_df
+
 def extract_number_from_string(s):
     # Regular expression pattern to find a number in the string
     pattern = r'\b\d+\b'
@@ -359,7 +368,8 @@ if selected_season:
         if Shotdist:
             game_shots_df = game_shots_df[(game_shots_df['Shot Distance'] >= shotdistance_min) & (game_shots_df['Shot Distance'] <= shotdistance_max)]
         if Player:
-             game_shots_df = game_shots_df[game_shots_df['text'].str.contains('|'.join(player_names), case=False, na=False)]
+            game_shots_df = filter_player_actions(game_shots_df, player_names)
+            # game_shots_df = game_shots_df[game_shots_df['text'].str.contains('|'.join(player_names), case=False, na=False)]
         if Shottype:
             game_shots_df = game_shots_df[game_shots_df['type.text'].isin(shottype)]
         if Points:
