@@ -370,7 +370,7 @@ if selected_season:
         if Shottype:
             game_shots_df = game_shots_df[game_shots_df['type.text'].isin(shottype)]
         if Points:
-            game_shots_df = game_shots_df[game_shots_df['Shot Attempted'] == int(points)]
+            game_shots_df = game_shots_df[(game_shots_df['Shot Attempted'] == int(points)) | (game_shots_df['scoreValue'] == int(points))]
         if Time:
             game_shots_df = game_shots_df[(game_shots_df['clock.minutes'] >= timemin) & (game_shots_df['clock.minutes'] <= timemax)]
         if Make:
