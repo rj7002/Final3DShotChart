@@ -406,7 +406,7 @@ if selected_season:
             game_coords_df = pd.concat([game_coords_df, shot_df])
     
         # draw shot paths
-        color_map={'home':home_color2,'away':away_color2}
+        color_map={'away':away_color2,'home':home_color2}
     
         shot_path_fig = px.line_3d(
             data_frame=game_coords_df,
