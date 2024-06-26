@@ -202,6 +202,7 @@ if selected_season:
     
     
         unique_periods = df['period.displayValue'].unique()
+        uniqueshots = df['type.text].unique()
 
         df.to_csv(output_csv, index=False)
         Make = st.sidebar.toggle('Make/Miss')
@@ -235,19 +236,7 @@ if selected_season:
 
         Shottype = st.sidebar.toggle('Shot Type')
         if Shottype == 1:
-            shottype = st.sidebar.selectbox('', ['Jump Shot', 'Layup','Dunk','Other'])
-            if shottype == 'Jump Shot':
-                jumpshottype = st.sidebar.multiselect('', ['Step Back Jump shot', 'Running Pull-Up Jump Shot','Turnaround Fade Away shot','Fade Away Jump Shot','Pullup Jump Shot','Jump Bank Shot','Jump Shot'])
-                finaltype = jumpshottype
-            elif shottype == 'Layup':
-                layuptype = st.sidebar.multiselect('', ['Layup Shot', 'Running Finger Roll Layup Shot','Cutting Layup Shot','Driving Layup Shot','Running Layup Shot','Alley Oop Layup shot','Tip Layup Shot','Reverse Layup Shot','Driving Reverse Layup Shot','Running Reverse Layup Shot'])
-                finaltype = layuptype
-            elif shottype == 'Dunk':
-                dunktype = st.sidebar.multiselect('', ['Running Dunk Shot', 'Cutting Dunk Shot','Running Reverse Dunk Shot','Running Alley Oop Dunk Shot','Dunk Shot','Tip Dunk Shot'])    
-                finaltype = dunktype
-            elif shottype == 'Other':
-                othertype = st.sidebar.multiselect('', ['Driving Floating Jump Shot', 'Floating Jump shot','Driving Floating Bank Jump Shot','Driving Bank Hook Shot','Driving Hook Shot','Turnaround Hook Shot','Hook Shot'])
-                finaltype = othertype
+            shottype = st.sidebar.multiselect('',uniqueshots)
         Points = st.sidebar.toggle('Points')
         if Points == 1:
             points = st.sidebar.selectbox('',['2','3'])
@@ -371,7 +360,7 @@ if selected_season:
         if Player:
              game_shots_df = game_shots_df[game_shots_df['text'].str.contains('|'.join(player_names), case=False, na=False)]
         if Shottype:
-            game_shots_df = game_shots_df[game_shots_df['type.text'].isin(finaltype)]
+            game_shots_df = game_shots_df[game_shots_df['type.text'].isin(uniqueshots)]
         if Points:
             game_shots_df = game_shots_df[game_shots_df['scoreValue'] == int(points)]
         if Time:
