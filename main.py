@@ -660,10 +660,16 @@ if selected_season:
                 time.sleep(3)
             placeholder.plotly_chart(fig, use_container_width=True)
             coli1,coli2 = st.columns(2)
-            awayper = (awaycount/awaytotal) * 100
-            awayper = round(awayper,2)
-            homeper = (homecount/hometotal) * 100
-            homeper = round(homeper,2)
+            if awaytotal != 0:
+                awayper = (awaycount/awaytotal) * 100
+                awayper = round(awayper,2)
+            else:
+                awayper = 0
+            if hometotal != 0:
+                homeper = (homecount/hometotal) * 100
+                homeper = round(homeper,2)
+            else:
+                homeper = 0
             with coli1:
                 st.markdown(f'<h3 style="text-align:center;">'
                 f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}:</span> '
@@ -680,10 +686,16 @@ if selected_season:
             if normalplot:
                 st.plotly_chart(fig, use_container_width=True)
                 coli1,coli2 = st.columns(2)
-                awayper = (awaycount/awaytotal) * 100
-                awayper = round(awayper,2)
-                homeper = (homecount/hometotal) * 100
-                homeper = round(homeper,2)
+                if awaytotal != 0:
+                    awayper = (awaycount/awaytotal) * 100
+                    awayper = round(awayper,2)
+                else:
+                    awayper = 0
+                if hometotal != 0:
+                    homeper = (homecount/hometotal) * 100
+                    homeper = round(homeper,2)
+                else:
+                    homeper = 0
                 with coli1:
                     st.markdown(f'<h3 style="text-align:center;">'
                     f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}:</span> '
@@ -698,10 +710,16 @@ if selected_season:
         else:
             st.plotly_chart(fig, use_container_width=True)
             coli1,coli2 = st.columns(2)
-            awayper = (awaycount/awaytotal) * 100
-            awayper = round(awayper,2)
-            homeper = (homecount/hometotal) * 100
-            homeper = round(homeper,2)
+            if awaytotal != 0:
+                awayper = (awaycount/awaytotal) * 100
+                awayper = round(awayper,2)
+            else:
+                awayper = 0
+            if hometotal != 0:
+                homeper = (homecount/hometotal) * 100
+                homeper = round(homeper,2)
+            else:
+                homeper = 0
             with coli1:
                 st.markdown(f'<h3 style="text-align:center;">'
                 f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}:</span> '
