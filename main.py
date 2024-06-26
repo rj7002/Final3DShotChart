@@ -113,7 +113,7 @@ def display_team_image(teamname, width2):
 
 
 
-st.set_page_config(page_title="3D NBA Shot Visualizer", page_icon='https://www.shutterstock.com/image-vector/basketball-player-shooting-ball-abstract-260nw-1059100829.jpg',layout="wide")
+st.set_page_config(page_title="3D NBA Shot Visualizer", page_icon='https://i.imgur.com/3oGJTcf.png',layout="wide")
 st.markdown(f'<h3 style="color: gray; text-align: center; font-size: 100px;">3D NBA Shot Visualizer</h3>', unsafe_allow_html=True)
 
 st.sidebar.markdown('<div style="text-align: center;"><span style="font-size:30px;">3D NBA Shot Visualizer</span></div>', unsafe_allow_html=True)
@@ -720,6 +720,10 @@ if selected_season:
                 f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}:</span> '
                 f'<span style="color: {home_color};">{homecount}/{hometotal} ({homeper}%)</span> '
                 f'</h3>', unsafe_allow_html=True)
+else:
+    image_url = 'https://i.imgur.com/3oGJTcf.png'
+
+    st.markdown(f'<img src="{image_url}" style="width:100%; height:auto;">', unsafe_allow_html=True)
 
     
     
