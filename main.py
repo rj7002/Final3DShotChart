@@ -478,8 +478,7 @@ if selected_season:
                 bgcolor='rgba(0, 0, 0, 0)',
                 title='',
                 itemsizing='constant'
-            ),
-            legend_traceorder="reversed"
+            )
         )
         normalplot = st.sidebar.button('Normal Plot')
         play = st.sidebar.button('Play by play')
