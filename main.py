@@ -218,6 +218,7 @@ if selected_season:
         if Player == 1:
             import sportsdataverse.nba.nba_game_rosters as nba_rosters
             roster_data = nba_rosters.espn_nba_game_rosters(game_id=id, return_as_pandas=True)
+            roster_data = roster_data[roster_data['did_not_play'] != True]
             player_names = roster_data['full_name'].tolist()
             players = st.sidebar.multiselect('',player_names)
         Shottype = st.sidebar.toggle('Shot Type')
