@@ -369,6 +369,7 @@ if selected_season:
             game_shots_df = game_shots_df[(game_shots_df['Shot Distance'] >= shotdistance_min) & (game_shots_df['Shot Distance'] <= shotdistance_max)]
         if Player:
             game_shots_df = filter_player_actions(game_shots_df, player_names)
+            st.write(game_shots_df)
             # game_shots_df = game_shots_df[game_shots_df['text'].str.contains('|'.join(player_names), case=False, na=False)]
         if Shottype:
             game_shots_df = game_shots_df[game_shots_df['type.text'].isin(shottype)]
