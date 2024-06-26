@@ -526,7 +526,7 @@ if selected_season:
                 scene_aspectmode="data",
                 height=600,
                 scene_camera=dict(
-                    eye=dict(x=1.3, y=0, z=0.7)
+                    eye=dict(x=1.5, y=0, z=0.2)
                 ),
                 scene=dict(
                     xaxis=dict(title='', showticklabels=False, showgrid=False),
