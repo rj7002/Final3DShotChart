@@ -499,7 +499,6 @@ if selected_season:
         )
         normalplot = st.sidebar.button('Normal Plot')
         play = st.sidebar.button('Play by play')
-        speed = st.sidebar.number_input('Play by play delay',min_value=0,max_value=5,value=2)
         
         if play:
             # Draw basketball court lines
@@ -648,7 +647,7 @@ if selected_season:
                     st.text('')
                 else:
                     message_placeholder.text(f'Latest shot: {message} - {message2}: {message3}')
-                time.sleep(speed)
+                time.sleep(2)
             placeholder.plotly_chart(fig, use_container_width=True)
             coli1,coli2 = st.columns(2)
             if awaytotal != 0:
