@@ -201,7 +201,8 @@ if selected_season:
 
     
     
-    
+        unique_periods = df['period.displayValue'].unique()
+
         df.to_csv(output_csv, index=False)
         Make = st.sidebar.toggle('Make/Miss')
         if Make == 1:
@@ -212,7 +213,7 @@ if selected_season:
                 rmakemiss = False
         Quarter = st.sidebar.toggle('Quarter')
         if Quarter == 1:
-            quart = st.sidebar.multiselect('',['1st Quarter','2nd Quarter','3rd Quarter','4th Quarter'])
+            quart = st.sidebar.multiselect('',unique_periods)
         Player = st.sidebar.toggle('Players')
         if Player == 1:
             import sportsdataverse.nba.nba_game_rosters as nba_rosters
