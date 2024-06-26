@@ -16,7 +16,7 @@ import re
 
 def filter_player_actions(df, player_names):
     # Combine player names into a single regex pattern
-    pattern = '|'.join([rf'{name}\s+(made|missed)' for name in player_names])
+    pattern = '|'.join([rf'{name}\s+(made|make|missed|miss|makes|misses)' for name in player_names])
     
     # Apply the filter using regex matching
     filtered_df = df[df['text'].str.contains(pattern, flags=re.IGNORECASE, regex=True)]
