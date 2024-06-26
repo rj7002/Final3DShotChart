@@ -219,8 +219,20 @@ if selected_season:
             import sportsdataverse.nba.nba_game_rosters as nba_rosters
             roster_data = nba_rosters.espn_nba_game_rosters(game_id=id, return_as_pandas=True)
             roster_data = roster_data[roster_data['did_not_play'] != True]
-            player_names = roster_data['full_name'].tolist()
-            players = st.sidebar.multiselect('',player_names)
+            names = []
+            for index, row2 in roster_data.iterrows():
+                name = row2['full_name']
+                team = row2['team_display_name']
+                player = name + " - " + team
+                names.append(player)
+            # player_names = roster_data['full_name'].tolist()
+            players = st.sidebar.multiselect('',names)
+            player_names = []
+            for player_info in players:
+                # Split each player_info string by ' - ' to separate player name and team
+                player_name = player_info.split(' - ')[0]
+                player_names.append(player_name)
+
         Shottype = st.sidebar.toggle('Shot Type')
         if Shottype == 1:
             shottype = st.sidebar.selectbox('', ['Jump Shot', 'Layup','Dunk','Other'])
@@ -357,7 +369,7 @@ if selected_season:
         if Shotdist:
             game_shots_df = game_shots_df[(game_shots_df['Shot Distance'] >= shotdistance_min) & (game_shots_df['Shot Distance'] <= shotdistance_max)]
         if Player:
-             game_shots_df = game_shots_df[game_shots_df['text'].str.contains('|'.join(players), case=False, na=False)]
+             game_shots_df = game_shots_df[game_shots_df['text'].str.contains('|'.join(player_names), case=False, na=False)]
         if Shottype:
             game_shots_df = game_shots_df[game_shots_df['type.text'].isin(finaltype)]
         if Points:
