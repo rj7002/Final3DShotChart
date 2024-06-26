@@ -665,12 +665,12 @@ if selected_season:
             homeper = round(homeper,2)
             with coli1:
                 st.markdown(f'<h3 style="text-align:center;">'
-                f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}</span>: '
+                f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}:</span> '
                 f'<span style="color: {away_color};">{awaycount}/{awaytotal} ({awayper}%)</span> '
                 f'</h3>', unsafe_allow_html=True)
             with coli2:
                 st.markdown(f'<h3 style="text-align:center;">'
-                f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}</span>: '
+                f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}:</span> '
                 f'<span style="color: {home_color};">{homecount}/{hometotal} ({homeper}%)</span> '
                 f'</h3>', unsafe_allow_html=True)
             with st.expander('All Shots'):
@@ -685,12 +685,12 @@ if selected_season:
                 homeper = round(homeper,2)
                 with coli1:
                     st.markdown(f'<h3 style="text-align:center;">'
-                    f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}</span>: '
+                    f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}:</span> '
                     f'<span style="color: {away_color};">{awaycount}/{awaytotal} ({awayper}%)</span> '
                     f'</h3>', unsafe_allow_html=True)
                 with coli2:
                     st.markdown(f'<h3 style="text-align:center;">'
-                    f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}</span>: '
+                    f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}:</span> '
                     f'<span style="color: {home_color};">{homecount}/{hometotal} ({homeper}%)</span> '
                     f'</h3>', unsafe_allow_html=True)
 
@@ -703,12 +703,12 @@ if selected_season:
             homeper = round(homeper,2)
             with coli1:
                 st.markdown(f'<h3 style="text-align:center;">'
-                f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}</span>: '
+                f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}:</span> '
                 f'<span style="color: {away_color};">{awaycount}/{awaytotal} ({awayper}%)</span> '
                 f'</h3>', unsafe_allow_html=True)
             with coli2:
                 st.markdown(f'<h3 style="text-align:center;">'
-                f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}</span>: '
+                f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}:</span> '
                 f'<span style="color: {home_color};">{homecount}/{hometotal} ({homeper}%)</span> '
                 f'</h3>', unsafe_allow_html=True)
 
