@@ -405,7 +405,19 @@ if selected_season:
     
         game_coords_df = pd.DataFrame()
         # generate coordinates for shot paths
+         homecount = 0
+        hometotal = 0
+        awaycount = 0
+        awaytotal = 0
         for index, row in game_shots_df.iterrows():
+            if row['team.id'] == team_id:
+                hometotal+=1
+            if row['scoringPlay'] == True:
+                homecount+=1
+            elif row['team.id'] != team_id:
+                awaytotal+=1
+            if row['scoringPlay'] == True:
+                awaycount+=1
             shot = BasketballShot(
                 shot_start_x=row['coordinate.x'], 
                 shot_start_y=row['coordinate.y'], 
@@ -646,13 +658,59 @@ if selected_season:
                     message_placeholder.text(f'Latest shot: {message} - {message2}: {message3}')
                 time.sleep(3)
             placeholder.plotly_chart(fig, use_container_width=True)
+            coli1,coli2 = st.columns(2)
+            awayper = (awaycount/awaytotal) * 100
+            awayper = round(awayper,2)
+            homeper = (homecount/hometotal) * 100
+            homeper = round(homeper,2)
+            with coli1:
+                st.markdown(f'<h3 style="text-align:center;">'
+                f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}</span>: '
+                f'<span style="color: {away_color};">{awaycount}/{awaytotal} ({awayper}%)</span> '
+                f'</h3>', unsafe_allow_html=True)
+            with coli2:
+                st.markdown(f'<h3 style="text-align:center;">'
+                f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}</span>: '
+                f'<span style="color: {home_color};">{homecount}/{hometotal} ({homeper}%)</span> '
+                f'</h3>', unsafe_allow_html=True)
             with st.expander('All Shots'):
                 for msg in messages:
                     st.text(msg)
             if normalplot:
-                    st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, use_container_width=True)
+                coli1,coli2 = st.columns(2)
+                awayper = (awaycount/awaytotal) * 100
+                awayper = round(awayper,2)
+                homeper = (homecount/hometotal) * 100
+                homeper = round(homeper,2)
+                with coli1:
+                    st.markdown(f'<h3 style="text-align:center;">'
+                    f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}</span>: '
+                    f'<span style="color: {away_color};">{awaycount}/{awaytotal} ({awayper}%)</span> '
+                    f'</h3>', unsafe_allow_html=True)
+                with coli2:
+                    st.markdown(f'<h3 style="text-align:center;">'
+                    f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}</span>: '
+                    f'<span style="color: {home_color};">{homecount}/{hometotal} ({homeper}%)</span> '
+                    f'</h3>', unsafe_allow_html=True)
 
         else:
             st.plotly_chart(fig, use_container_width=True)
+            coli1,coli2 = st.columns(2)
+            awayper = (awaycount/awaytotal) * 100
+            awayper = round(awayper,2)
+            homeper = (homecount/hometotal) * 100
+            homeper = round(homeper,2)
+            with coli1:
+                st.markdown(f'<h3 style="text-align:center;">'
+                f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}</span>: '
+                f'<span style="color: {away_color};">{awaycount}/{awaytotal} ({awayper}%)</span> '
+                f'</h3>', unsafe_allow_html=True)
+            with coli2:
+                st.markdown(f'<h3 style="text-align:center;">'
+                f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}</span>: '
+                f'<span style="color: {home_color};">{homecount}/{hometotal} ({homeper}%)</span> '
+                f'</h3>', unsafe_allow_html=True)
+
     
     
