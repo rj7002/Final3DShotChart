@@ -1,3 +1,4 @@
+
 #made by Ryan Joseph
 from datetime import date
 from datetime import datetime
@@ -498,9 +499,9 @@ if selected_season:
         )
         normalplot = st.sidebar.button('Normal Plot')
         play = st.sidebar.button('Play by play')
+        speed = st.sidebar.number_input('Play by play delay',min_value=0,max_value=5,value=2)
         
         if play:
-            speed = st.number_input('Delay',min_value=0,max_value=5)
             # Draw basketball court lines
             court = CourtCoordinates()
             court_lines_df = court.get_court_lines()
@@ -571,108 +572,108 @@ if selected_season:
             message2 = st.empty()
             message3 = st.empty()
             messages = []
-            if speed:
-                for index, row in game_shots_df.iterrows():
-                    # Assuming BasketballShot class or function to generate shot coordinates
-                    shot = BasketballShot(
-                        shot_start_x=row['coordinate.x'], 
-                        shot_start_y=row['coordinate.y'], 
-                        shot_id=row['sequenceNumber'],
-                        play_description=row['text'],
-                        shot_made=row['scoringPlay'],
-                        team=row['team'],
-                        quarter=row['period.displayValue'],
-                        time=row['clock.displayValue'])
-                    
-                    shot_df = shot.get_shot_path_coordinates()
-                    game_coords_df = pd.concat([game_coords_df, shot_df])
-        
-                    # Draw shot paths
-                    color_map = {'home': home_color2, 'away': away_color}
-                    shot_path_fig = px.line_3d(
-                        data_frame=game_coords_df,
-                        x='x',
-                        y='y',
-                        z='z',
-                        line_group='line_id',
-                        color='team',
-                        color_discrete_map=color_map,
-                        custom_data=['description', 'z', 'quarter', 'time']
-                    )
-        
-                    hovertemplate = '%{customdata[0]}<br>%{customdata[2]} - %{customdata[3]}'
-                    shot_path_fig.update_traces(opacity=0.55, hovertemplate=hovertemplate, showlegend=False)
-        
-                    # Draw shot start scatter plots
-                    game_coords_start = game_coords_df[game_coords_df['shot_coord_index'] == 0]
-                    symbol_map = {'made': 'circle-open', 'missed': 'cross'}
-                    color_map = {'home': home_color, 'away': away_color2}
-                    shot_start_fig = px.scatter_3d(
-                        data_frame=game_coords_start,
-                        x='x',
-                        y='y',
-                        z='z',
-                        custom_data=['description', 'z', 'quarter', 'time'],
-                        color='team',
-                        color_discrete_map=color_map,
-                        symbol='shot_made',
-                        symbol_map=symbol_map,
-                    )
-        
-                    shot_start_fig.update_traces(marker_size=7, hovertemplate=hovertemplate,showlegend=False)
-        
-                    # Add shot scatter plot to the existing figure
-                    
-        
-                    for trace in shot_start_fig.data:
-                        fig.add_trace(trace)
-        
-                    # Add shot line plot to the existing figure
-                    for trace in shot_path_fig.data:
-                        fig.add_trace(trace)
-        
-                    # Update layout and display the figure dynamically
-                    fig.update_traces(line=dict(width=5))
-                    message = row['text']
-                    message2 = row['period.displayValue']
-                    message3 = row['clock.displayValue']
-                    if row['scoringPlay'] == True:
-                        finalmessage = f"✅ {message} - {message2}: {message3}"
-                    else:
-                        finalmessage = f"❌ {message} - {message2}: {message3}"
-                    messages.append(finalmessage)
-                    placeholder.plotly_chart(fig, use_container_width=True)
-                    message_placeholder.text(message)
-                    if message == None:
-                        st.text('')
-                    else:
-                        message_placeholder.text(f'Latest shot: {message} - {message2}: {message3}')
-                    time.sleep(3)
+            
+            for index, row in game_shots_df.iterrows():
+                # Assuming BasketballShot class or function to generate shot coordinates
+                shot = BasketballShot(
+                    shot_start_x=row['coordinate.x'], 
+                    shot_start_y=row['coordinate.y'], 
+                    shot_id=row['sequenceNumber'],
+                    play_description=row['text'],
+                    shot_made=row['scoringPlay'],
+                    team=row['team'],
+                    quarter=row['period.displayValue'],
+                    time=row['clock.displayValue'])
+                
+                shot_df = shot.get_shot_path_coordinates()
+                game_coords_df = pd.concat([game_coords_df, shot_df])
+    
+                # Draw shot paths
+                color_map = {'home': home_color2, 'away': away_color}
+                shot_path_fig = px.line_3d(
+                    data_frame=game_coords_df,
+                    x='x',
+                    y='y',
+                    z='z',
+                    line_group='line_id',
+                    color='team',
+                    color_discrete_map=color_map,
+                    custom_data=['description', 'z', 'quarter', 'time']
+                )
+    
+                hovertemplate = '%{customdata[0]}<br>%{customdata[2]} - %{customdata[3]}'
+                shot_path_fig.update_traces(opacity=0.55, hovertemplate=hovertemplate, showlegend=False)
+    
+                # Draw shot start scatter plots
+                game_coords_start = game_coords_df[game_coords_df['shot_coord_index'] == 0]
+                symbol_map = {'made': 'circle-open', 'missed': 'cross'}
+                color_map = {'home': home_color, 'away': away_color2}
+                shot_start_fig = px.scatter_3d(
+                    data_frame=game_coords_start,
+                    x='x',
+                    y='y',
+                    z='z',
+                    custom_data=['description', 'z', 'quarter', 'time'],
+                    color='team',
+                    color_discrete_map=color_map,
+                    symbol='shot_made',
+                    symbol_map=symbol_map,
+                )
+    
+                shot_start_fig.update_traces(marker_size=7, hovertemplate=hovertemplate,showlegend=False)
+    
+                # Add shot scatter plot to the existing figure
+                
+    
+                for trace in shot_start_fig.data:
+                    fig.add_trace(trace)
+    
+                # Add shot line plot to the existing figure
+                for trace in shot_path_fig.data:
+                    fig.add_trace(trace)
+    
+                # Update layout and display the figure dynamically
+                fig.update_traces(line=dict(width=5))
+                message = row['text']
+                message2 = row['period.displayValue']
+                message3 = row['clock.displayValue']
+                if row['scoringPlay'] == True:
+                    finalmessage = f"✅ {message} - {message2}: {message3}"
+                else:
+                    finalmessage = f"❌ {message} - {message2}: {message3}"
+                messages.append(finalmessage)
                 placeholder.plotly_chart(fig, use_container_width=True)
-                coli1,coli2 = st.columns(2)
-                if awaytotal != 0:
-                    awayper = (awaycount/awaytotal) * 100
-                    awayper = round(awayper,2)
+                message_placeholder.text(message)
+                if message == None:
+                    st.text('')
                 else:
-                    awayper = 0
-                if hometotal != 0:
-                    homeper = (homecount/hometotal) * 100
-                    homeper = round(homeper,2)
-                else:
-                    homeper = 0
-                with coli1:
-                    st.markdown(f'<h3 style="text-align:center;">'
-                    f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}:</span> '
-                    f'<span style="color: {away_color};">{awaycount}/{awaytotal} ({awayper}%)</span> '
-                    f'</h3>', unsafe_allow_html=True)
-                with coli2:
-                    st.markdown(f'<h3 style="text-align:center;">'
-                    f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}:</span> '
-                    f'<span style="color: {home_color};">{homecount}/{hometotal} ({homeper}%)</span> '
-                    f'</h3>', unsafe_allow_html=True)
-                with st.expander('All Shots'):
-                    for msg in messages:
-                        st.text(msg)
+                    message_placeholder.text(f'Latest shot: {message} - {message2}: {message3}')
+                time.sleep(speed)
+            placeholder.plotly_chart(fig, use_container_width=True)
+            coli1,coli2 = st.columns(2)
+            if awaytotal != 0:
+                awayper = (awaycount/awaytotal) * 100
+                awayper = round(awayper,2)
+            else:
+                awayper = 0
+            if hometotal != 0:
+                homeper = (homecount/hometotal) * 100
+                homeper = round(homeper,2)
+            else:
+                homeper = 0
+            with coli1:
+                st.markdown(f'<h3 style="text-align:center;">'
+                f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}:</span> '
+                f'<span style="color: {away_color};">{awaycount}/{awaytotal} ({awayper}%)</span> '
+                f'</h3>', unsafe_allow_html=True)
+            with coli2:
+                st.markdown(f'<h3 style="text-align:center;">'
+                f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}:</span> '
+                f'<span style="color: {home_color};">{homecount}/{hometotal} ({homeper}%)</span> '
+                f'</h3>', unsafe_allow_html=True)
+            with st.expander('All Shots'):
+                for msg in messages:
+                    st.text(msg)
             if normalplot:
                 st.plotly_chart(fig, use_container_width=True)
                 coli1,coli2 = st.columns(2)
