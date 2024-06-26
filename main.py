@@ -405,7 +405,7 @@ if selected_season:
     
         game_coords_df = pd.DataFrame()
         # generate coordinates for shot paths
-         homecount = 0
+        homecount = 0
         hometotal = 0
         awaycount = 0
         awaytotal = 0
