@@ -202,7 +202,7 @@ if selected_season:
     
     
         unique_periods = df['period.displayValue'].unique()
-        uniqueshots = df['type.text].unique()
+        uniqueshots = df['type.text'].unique()
 
         df.to_csv(output_csv, index=False)
         Make = st.sidebar.toggle('Make/Miss')
