@@ -460,7 +460,7 @@ if selected_season:
             symbol_map=symbol_map
         )
     
-        shot_start_fig.update_traces(marker_size=7, hovertemplate=hovertemplate2)
+        shot_start_fig.update_traces(marker_size=10, hovertemplate=hovertemplate2)
     
         # add shot scatter plot to court plot
         for i in range(len(shot_start_fig.data)):
@@ -619,7 +619,7 @@ if selected_season:
                     symbol_map=symbol_map,
                 )
     
-                shot_start_fig.update_traces(marker_size=7, hovertemplate=hovertemplate,showlegend=False)
+                shot_start_fig.update_traces(marker_size=10, hovertemplate=hovertemplate,showlegend=False)
     
                 # Add shot scatter plot to the existing figure
                 
