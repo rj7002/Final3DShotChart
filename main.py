@@ -145,7 +145,7 @@ if selected_season:
     games = []
     for index, row in df.iterrows():
         # Concatenate home team and away team names for the current row
-        ddate2 = row['date']
+        ddate2 = row['start_date']
         parsed_date2 = datetime.strptime(ddate2, "%Y-%m-%dT%H:%MZ")
     
         # Format the datetime object into the desired string format
