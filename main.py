@@ -560,7 +560,7 @@ if selected_season:
     
             filtered_shot_df = df.copy()
     
-             if Quarter:
+            if Quarter:
                 filtered_shot_df = filtered_shot_df[filtered_shot_df['period.displayValue'].isin(quart)]
             if Shotdist:
                 filtered_shot_df = filtered_shot_df[(filtered_shot_df['Shot Distance'] >= shotdistance_min) & (filtered_shot_df['Shot Distance'] <= shotdistance_max)]
