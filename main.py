@@ -523,7 +523,7 @@ if selected_season:
                 line_group='line_group',
                 color='color',
                 color_discrete_map={
-                    'court': '#000000',
+                    'court': '#fdfbf5'',
                     'hoop': '#e47041'
                 }
             )
