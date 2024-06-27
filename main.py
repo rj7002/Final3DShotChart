@@ -560,13 +560,22 @@ if selected_season:
     
             filtered_shot_df = df.copy()
     
-            for key, value in filters.items():
-                if value is not None:
-                    if isinstance(value, tuple):
-                        filtered_shot_df = filtered_shot_df[(filtered_shot_df[key] >= value[0]) & (filtered_shot_df[key] <= value[1])]
-                    else:
-                        filtered_shot_df = filtered_shot_df[filtered_shot_df[key].isin(value)]
-    
+             if Quarter:
+                filtered_shot_df = filtered_shot_df[filtered_shot_df['period.displayValue'].isin(quart)]
+            if Shotdist:
+                filtered_shot_df = filtered_shot_df[(filtered_shot_df['Shot Distance'] >= shotdistance_min) & (filtered_shot_df['Shot Distance'] <= shotdistance_max)]
+            if Player:
+                filtered_shot_df = filter_player_actions(filtered_shot_df, player_names)
+                # game_shots_df = game_shots_df[game_shots_df['text'].str.contains('|'.join(player_names), case=False, na=False)]
+            if Shottype:
+                filtered_shot_df = filtered_shot_df[filtered_shot_df['type.text'].isin(shottype)]
+            if Points:
+                filtered_shot_df = filtered_shot_df[filtered_shot_df['scoreValue'] == int(points)]
+            if Time:
+                filtered_shot_df = filtered_shot_df[(filtered_shot_df['clock.minutes'] >= timemin) & (filtered_shot_df['clock.minutes'] <= timemax)]
+            if Make:
+                filtered_shot_df = filtered_shot_df[filtered_shot_df['scoringPlay'] == rmakemiss]
+        
             # Initialize an empty list to store trace objects
             traces = []
             message_placeholder = st.empty()
