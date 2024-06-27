@@ -492,7 +492,7 @@ if selected_season:
             scene=dict(
                 xaxis=dict(title='', showticklabels=False, showgrid=False),
                 yaxis=dict(title='', showticklabels=False, showgrid=False),
-                zaxis=dict(title='',  showticklabels=False, showgrid=False, showbackground=True, backgroundcolor='#D2B48C'),
+                zaxis=dict(title='',  showticklabels=False, showgrid=False, showbackground=True, backgroundcolor='#d2a679'),
             ),
             showlegend=False,
             legend=dict(
@@ -541,7 +541,7 @@ if selected_season:
                 scene=dict(
                     xaxis=dict(title='', showticklabels=False, showgrid=False),
                     yaxis=dict(title='', showticklabels=False, showgrid=False),
-                    zaxis=dict(title='', showticklabels=False, showgrid=False, showbackground=True, backgroundcolor='#D2B48C'),
+                    zaxis=dict(title='', showticklabels=False, showgrid=False, showbackground=True, backgroundcolor='#d2a679'),
                 )
             )
     
