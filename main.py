@@ -757,6 +757,100 @@ if selected_season:
                 f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}:</span> '
                 f'<span style="color: {home_color};">{homecount}/{hometotal} ({homeper}%)</span> '
                 f'</h3>', unsafe_allow_html=True)
+        nba_data = sportsdataverse.nba.espn_nba_pbp(game_id=id)
+        # Check if 'boxscore' exists in the fetched data
+        df = nba_data['boxscore']
+
+        teams = df['teams']
+        players = df['players']
+        def flatten_team_data(teams):
+            flat_list = []
+            for team in teams:
+                team_info = team['team']
+                stats = {stat['label']: stat['displayValue'] for stat in team['statistics']}
+                stats.update({
+                    'team_id': team_info['id'],
+                    'team_location': team_info['location'],
+                    'team_name': team_info['name'],
+                    'team_abbreviation': team_info['abbreviation'],
+                    'team_displayName': team_info['displayName'],
+                    'homeAway': team['homeAway']
+                })
+                flat_list.append(stats)
+            return pd.DataFrame(flat_list)
+
+        # Apply the function to the data
+        team_df = flatten_team_data(df['teams'])
+        # team_df.to_csv('route_locations_2019.csv')
+
+        def flatten_player_data(players):
+            flat_list = []
+            
+            for team in players:
+                team_info = team['team']
+                stats_labels = team['statistics'][0]['labels']
+                stats_keys = team['statistics'][0]['keys']
+                
+                for player in team['statistics'][0]['athletes']:
+                    if player['stats']:
+                        player_stats = {key: value for key, value in zip(stats_keys, player['stats'])}
+                        player_info = player['athlete']
+                        
+                        player_data = {
+                            'player_id': player_info['id'],
+                            'player_name': player_info['displayName'],
+                            'player_shortName': player_info['shortName'],
+                            'player_position': player_info['position']['displayName'],
+                            'team_id': team_info['id'],
+                            'team_location': team_info['location'],
+                            'team_name': team_info['name'],
+                            'team_abbreviation': team_info['abbreviation'],
+                            'team_displayName': team_info['displayName'],
+                        }
+                        
+                        player_data.update({label: player_stats.get(key, '') for label, key in zip(stats_labels, stats_keys)})
+                        
+                        flat_list.append(player_data)
+            
+            return pd.DataFrame(flat_list)
+        playerdf = flatten_player_data(players)
+        st.subheader('Team Boxscore')
+        team_df = team_df.drop(columns=['team_name','team_location','team_abbreviation','team_id'])
+        team_df = team_df[['team_displayName'] + [col for col in team_df.columns if col != 'team_displayName']]
+        st.write(team_df)
+        st.subheader('Player Boxscore')
+        st.write(playerdf[['player_name','team_displayName','player_position','MIN','FG','3PT','FT','OREB','DREB','REB','AST','STL','BLK','TO','PF','+/-','PTS']])
+
+
+
+        # Check if the data was fetched successfully and if 'videos' exists
+        if 'videos' in nba_data and nba_data['videos']:
+            videos_data = nba_data['videos']
+            
+            # Convert to DataFrame
+            if isinstance(videos_data, list):
+                try:
+                    videos_df = pd.DataFrame(videos_data)
+                    
+                    # Check if 'links' column exists
+                    if 'links' in videos_df.columns:
+                        # Extract 'links' column
+                        links_df = pd.json_normalize(videos_df['links'])
+                        with st.expander('Videos'):
+                            for index, row in links_df.iterrows():
+                                link = row['source.HD.href']
+                                st.video(link)
+                        
+                        # Print the new DataFrame to verify                        
+                        # Optionally, save the links DataFrame to a CSV file
+                    else:
+                        st.error("'links' column not found in the DataFrame.")
+                except ValueError as e:
+                    print("Error creating DataFrame:", e)
+            else:
+                st.error("Expected a list of dictionaries or similar format.")
+        else:
+            st.write("")
 else:
     image_url = 'https://i.imgur.com/3oGJTcf.png'
 
