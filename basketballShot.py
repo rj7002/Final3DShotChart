@@ -75,11 +75,11 @@ class BasketballShot:
         self.__calculate_shot_possible()
 
         if self.shot_distance >= 23:     # 3-point territory
-            self.shot_vertex_z = 17     
+            self.shot_vertex_z = 16     
         elif self.shot_distance >= 9:    # mid-range territory
-            self.shot_vertex_z = 15 
+            self.shot_vertex_z = 14 
         else:                            # roughly in the paint
-            self.shot_vertex_z = 13
+            self.shot_vertex_z = 12
 
     @staticmethod
     def __calculate_shot_vertex_x_quadratic_coefficients(x1, y1, x2, y2, k):
