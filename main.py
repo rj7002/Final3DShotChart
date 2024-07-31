@@ -469,13 +469,31 @@ if selected_season:
             
             symbol_map=symbol_map
         )
+        symbol_map2={'made': 'circle', 'missed': 'cross'}
+
+        shot_start_fig2 = px.scatter_3d(
+            data_frame=game_coords_start,
+            x='x',
+            y='y',
+            z='z',
+            custom_data=['description', 'z','quarter','time'],
+            color='team',
+            color_discrete_map=color_map,
+            # color_discrete_map=color_mapping,
+            
+            symbol='shot_made',
+            
+            symbol_map=symbol_map2
+        )
     
         shot_start_fig.update_traces(marker_size=10, hovertemplate=hovertemplate2)
+        shot_start_fig2.update_traces(marker_size=7)
+
     
         # add shot scatter plot to court plot
         for i in range(len(shot_start_fig.data)):
             fig.add_trace(shot_start_fig.data[i])
-    
+            fig.add_trace(shot_start_fig2.data[i])
         # add shot line plot to court plot
         for i in range(len(shot_path_fig.data)):
             fig.add_trace(shot_path_fig.data[i])
