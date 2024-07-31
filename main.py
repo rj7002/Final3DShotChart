@@ -487,7 +487,7 @@ if selected_season:
         )
     
         shot_start_fig.update_traces(marker_size=10, hovertemplate=hovertemplate2)
-        shot_start_fig2.update_traces(marker_size=7)
+        shot_start_fig2.update_traces(marker_size=7,hovertemplate=hovertemplate2)
 
     
         # add shot scatter plot to court plot
