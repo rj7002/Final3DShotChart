@@ -13,6 +13,7 @@ from sportsdataverse.nba.nba_pbp import espn_nba_pbp
 import plotly.graph_objects as go  # Import Plotly graph objects separately
 import time
 import re
+import sportsdataverse
 
 def filter_player_actions(df, player_names):
     # Combine player names into a single regex pattern
