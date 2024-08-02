@@ -399,7 +399,9 @@ if selected_season:
             color='color',
             color_discrete_map={
                 'court': '#000000',
-                'hoop': '#e47041'
+                'hoop': '#e47041',
+                'net': '#D3D3D3',
+                'backboard': 'gray'
             }
         )
         fig.update_traces(hovertemplate=None, hoverinfo='skip', showlegend=False)
@@ -535,17 +537,19 @@ if selected_season:
             court_lines_df = court.get_court_lines()
     
             fig = px.line_3d(
-                data_frame=court_lines_df,
-                x='x',
-                y='y',
-                z='z',
-                line_group='line_group',
-                color='color',
-                color_discrete_map={
-                    'court': '#000000',
-                    'hoop': '#e47041'
-                }
-            )
+            data_frame=court_lines_df,
+            x='x',
+            y='y',
+            z='z',
+            line_group='line_group',
+            color='color',
+            color_discrete_map={
+                'court': '#000000',
+                'hoop': '#e47041',
+                'net': '#D3D3D3',
+                'backboard': 'gray'
+            }
+        )
             fig.update_traces(hovertemplate=None, hoverinfo='skip', showlegend=False)
             fig.update_traces(line=dict(width=5))
     
