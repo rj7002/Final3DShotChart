@@ -100,18 +100,20 @@ class CourtCoordinates:
         '''
         Returns coordinates of the backboard on both ends of the court
         A backboard is 6 feet wide, 4 feet tall 
+        Also adds a smaller rectangle inside the backboard starting at hoop height
         '''
 
         backboard_start = (self.court_width / 2) - (self.backboard_width / 2)
         backboard_end = (self.court_width / 2) + (self.backboard_width / 2)
         height = self.backboard_height
         floor_offset = self.backboard_floor_offset
-        
+
         if loc == 'far':
             offset = self.backboard_baseline_offset
         elif loc == 'near':
             offset = self.court_length - self.backboard_baseline_offset
 
+        # Backboard coordinates
         backboard_bounds = [
             [backboard_start, offset, floor_offset], 
             [backboard_start, offset, floor_offset + height], 
@@ -120,11 +122,35 @@ class CourtCoordinates:
             [backboard_start, offset, floor_offset]
         ]
 
+        # Coordinates of the smaller rectangle
+        smaller_rect_width = 1.5  # Width of the smaller rectangle in feet
+        smaller_rect_height = 1  # Height of the smaller rectangle in feet
+        hoop_height = self.hoop_loc_z  # Height of the hoop
+
+        # Smaller rectangle coordinates
+        smaller_rect_start_x = backboard_start + (self.backboard_width / 2) - (smaller_rect_width / 2)
+        smaller_rect_end_x = backboard_start + (self.backboard_width / 2) + (smaller_rect_width / 2)
+        smaller_rect_y = offset  # Y coordinate same as the backboard
+
+        smaller_rect_bounds = [
+            [smaller_rect_start_x, offset, hoop_height], 
+            [smaller_rect_start_x, offset, hoop_height + smaller_rect_height], 
+            [smaller_rect_end_x, offset, hoop_height + smaller_rect_height], 
+            [smaller_rect_end_x, offset, hoop_height], 
+            [smaller_rect_start_x, offset, hoop_height]
+        ]
+
+        # Combine coordinates into DataFrames
         backboard_df = pd.DataFrame(backboard_bounds, columns=['x', 'y', 'z'])
         backboard_df['line_group'] = f'{loc}_backboard'
-        backboard_df['color'] = 'backboard'  # Set color to Light Gray
+        backboard_df['color'] = 'backboard'
 
-        return backboard_df
+        smaller_rect_df = pd.DataFrame(smaller_rect_bounds, columns=['x', 'y', 'z'])
+        smaller_rect_df['line_group'] = f'{loc}_smaller_rectangle'
+        smaller_rect_df['color'] = 'backboard'  # Set color for smaller rectangle
+
+        return pd.concat([backboard_df, smaller_rect_df])
+
     
     def __get_three_point_coordinates(self, loc):
         '''
