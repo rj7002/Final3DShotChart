@@ -102,13 +102,14 @@ class CourtCoordinates:
         A backboard is 6 feet wide, 4 feet tall 
         '''
 
-        backboard_start = (self.court_width/2)  -  (self.backboard_width/2)
-        backboard_end = (self.court_width/2) + (self.backboard_width/2)
+        backboard_start = (self.court_width / 2) - (self.backboard_width / 2)
+        backboard_end = (self.court_width / 2) + (self.backboard_width / 2)
         height = self.backboard_height
         floor_offset = self.backboard_floor_offset
+        
         if loc == 'far':
             offset = self.backboard_baseline_offset
-        if loc == 'near':
+        elif loc == 'near':
             offset = self.court_length - self.backboard_baseline_offset
 
         backboard_bounds = [
@@ -119,11 +120,11 @@ class CourtCoordinates:
             [backboard_start, offset, floor_offset]
         ]
 
-        backboard_df = pd.DataFrame(backboard_bounds, columns=['x','y','z'])
+        backboard_df = pd.DataFrame(backboard_bounds, columns=['x', 'y', 'z'])
         backboard_df['line_group'] = f'{loc}_backboard'
-        backboard_df['color'] = 'court'
+        backboard_df['color'] = 'backboard'  # Set color to Light Gray
 
-        return  backboard_df
+        return backboard_df
     
     def __get_three_point_coordinates(self, loc):
         '''
@@ -209,6 +210,48 @@ class CourtCoordinates:
         hoop_coordinates_df['color'] = 'hoop'
         
         return hoop_coordinates_df
+    def __get_hoop_coordinates2(self, loc):
+        num_net_lines = 10  # Number of vertical lines in the net
+        net_length = 1.75  # Length of the net hanging down from the hoop (in feet)
+        initial_radius = self.hoop_radius  # Radius at the top of the net
+
+        hoop_net_coordinates = []
+        hoop_loc_x, hoop_loc_y, hoop_loc_z = self.hoop_loc_x, self.hoop_loc_y, self.hoop_loc_z
+        if loc == 'near': 
+            hoop_loc_y = self.court_length - hoop_loc_y
+
+
+        for i in range(num_net_lines):
+            angle = (i * 2 * np.pi) / num_net_lines
+            
+            for j in np.linspace(0, net_length, num=10):
+                # Decrease the radius from the initial radius to half of it at the bottom
+                current_radius = initial_radius * (1 - (j / net_length) * 0.5)
+                
+                x = hoop_loc_x + current_radius * np.cos(angle)
+                y = hoop_loc_y + current_radius * np.sin(angle)
+                z = hoop_loc_z - j
+                
+                hoop_net_coordinates.append([x, y, z])
+        
+        # Add lines on the other side (negative angles)
+        for i in range(num_net_lines):
+            angle = (i * 2 * np.pi) / num_net_lines + np.pi  # Shift angles to cover the opposite side
+            
+            for j in np.linspace(0, net_length, num=10):
+                current_radius = initial_radius * (1 - (j / net_length) * 0.5)
+                
+                x = hoop_loc_x + current_radius * np.cos(angle)
+                y = hoop_loc_y + current_radius * np.sin(angle)
+                z = hoop_loc_z - j
+                
+                hoop_net_coordinates.append([x, y, z])
+        
+        hoop_net_df = pd.DataFrame(hoop_net_coordinates, columns=['x', 'y', 'z'])
+        hoop_net_df['line_group'] = f'{loc}hoop_net'
+        hoop_net_df['color'] = 'net'  # Set color to Light Gray or any other color you prefer
+
+        return hoop_net_df
 
 
 
@@ -357,11 +400,13 @@ class CourtCoordinates:
         backboard_away = self.__get_backboard_coordinates('far')
         hoop_away = self.__get_hoop_coordinates('near')
         hoop_home = self.__get_hoop_coordinates('far')
+        net_away = self.__get_hoop_coordinates2('near')
+        net_home = self.__get_hoop_coordinates2('far')
         three_home = self.__get_three_point_coordinates('near')
         three_away = self.__get_three_point_coordinates('far')
         free_throw_line = self.__get_free_throw_line_and_circle_coordinates('near')
         free_throw_line2 = self.__get_free_throw_line_and_circle_coordinates('far')  # Get free throw line coordinates
 
-        court_lines_df = pd.concat([court_df, half_df, backboard_home, backboard_away, hoop_away, hoop_home, three_home, three_away, free_throw_line,free_throw_line2])
+        court_lines_df = pd.concat([court_df, half_df, backboard_home, backboard_away, hoop_away, hoop_home, three_home, three_away, free_throw_line,free_throw_line2,net_away,net_home])
 
         return court_lines_df
