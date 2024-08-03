@@ -6,3 +6,4 @@ sportsdataverse
 datetime
 tqdm
 streamlit_plotly_events
+nba_api
