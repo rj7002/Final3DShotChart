@@ -753,7 +753,7 @@ if selected_season:
                 for msg in messages:
                     st.text(msg)
         else:
-            st.plotly_chart(fig)
+            # st.plotly_chart(fig)
             selected_points = plotly_events(fig, click_event=True, hover_event=False,select_event=True)
             if selected_season >= 2015:
                 st.caption("Click on a marker to view the highlight video")
@@ -865,7 +865,8 @@ if selected_season:
                                 st.write(description)
 
                                 st.video(video)
-
+            else:
+                selected_points = plotly_events(fig, click_event=True, hover_event=False,select_event=True)
        
         nba_data = sportsdataverse.nba.espn_nba_pbp(game_id=id)
         # Check if 'boxscore' exists in the fetched data
