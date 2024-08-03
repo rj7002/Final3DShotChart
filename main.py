@@ -6,8 +6,8 @@ import requests
 import streamlit as st
 import plotly.express as px
 import pandas as pd
-from utils.courtCoordinates import CourtCoordinates
-from utils.basketballShot import BasketballShot
+from courtCoordinates import CourtCoordinates
+from basketballShot import BasketballShot
 import pandas as pd
 from sportsdataverse.nba.nba_pbp import espn_nba_pbp
 import plotly.graph_objects as go  # Import Plotly graph objects separately
