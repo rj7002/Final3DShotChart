@@ -5,3 +5,4 @@ pandas
 sportsdataverse
 datetime
 tqdm
+streamlit_plotly_events
