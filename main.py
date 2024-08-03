@@ -6,14 +6,16 @@ import requests
 import streamlit as st
 import plotly.express as px
 import pandas as pd
-from courtCoordinates import CourtCoordinates
-from basketballShot import BasketballShot
+from utils.courtCoordinates import CourtCoordinates
+from utils.basketballShot import BasketballShot
 import pandas as pd
 from sportsdataverse.nba.nba_pbp import espn_nba_pbp
 import plotly.graph_objects as go  # Import Plotly graph objects separately
 import time
 import re
 import sportsdataverse
+from streamlit_plotly_events import plotly_events
+from datetime import datetime, timedelta
 
 def filter_player_actions(df, player_names):
     # Combine player names into a single regex pattern
@@ -176,6 +178,8 @@ if selected_season:
     id = parts[-1].strip()
     st.write('')
     if id:
+        date1 = parts[-2].strip()
+
         fdf = pd.read_csv('season.csv')
         filtered_df = fdf[fdf['game_id'] == id]
     
@@ -528,240 +532,346 @@ if selected_season:
                 itemsizing='constant'
             )
         )
-        normalplot = st.sidebar.button('Normal Plot')
-        play = st.sidebar.button('Play by play')
-        
-        if play:
-            # Draw basketball court lines
-            court = CourtCoordinates()
-            court_lines_df = court.get_court_lines()
-    
-            fig = px.line_3d(
-            data_frame=court_lines_df,
-            x='x',
-            y='y',
-            z='z',
-            line_group='line_group',
-            color='color',
-            color_discrete_map={
-                'court': '#000000',
-                'hoop': '#e47041',
-                'net': '#D3D3D3',
-                'backboard': 'gray'
-            }
-        )
-            fig.update_traces(hovertemplate=None, hoverinfo='skip', showlegend=False)
-            fig.update_traces(line=dict(width=5))
-    
-            # Apply layout settings
-            fig.update_layout(    
-                margin=dict(l=20, r=20, t=20, b=20),
-                scene_aspectmode="data",
-                height=600,
-                scene_camera=dict(
-                    eye=dict(x=1.5, y=0, z=0.2)
-                ),
-                scene=dict(
-                    xaxis=dict(title='', showticklabels=False, showgrid=False),
-                    yaxis=dict(title='', showticklabels=False, showgrid=False),
-                    zaxis=dict(title='', showticklabels=False, showgrid=False, showbackground=True, backgroundcolor='#d2a679'),
-                )
-            )
-    
-            # Create a Streamlit placeholder for the plot
-            placeholder = st.empty()
-    
-            # Prepare data filters
-            filters = {
-                'period.displayValue': quart if Quarter else None,
-                'Shot Distance': (shotdistance_min, shotdistance_max) if Shotdist else None,
-                'text': players if Player else None,
-                'type.text': finaltype if Shottype else None,
-                'scoreValue': int(points) if Points else None,
-                'clock.minutes': (timemin, timemax) if Time else None
-            }
-    
-            filtered_shot_df = df.copy()
-    
-            if Quarter:
-                filtered_shot_df = filtered_shot_df[filtered_shot_df['period.displayValue'].isin(quart)]
-            if Shotdist:
-                filtered_shot_df = filtered_shot_df[(filtered_shot_df['Shot Distance'] >= shotdistance_min) & (filtered_shot_df['Shot Distance'] <= shotdistance_max)]
-            if Player:
-                filtered_shot_df = filter_player_actions(filtered_shot_df, player_names)
-                # game_shots_df = game_shots_df[game_shots_df['text'].str.contains('|'.join(player_names), case=False, na=False)]
-            if Shottype:
-                filtered_shot_df = filtered_shot_df[filtered_shot_df['type.text'].isin(shottype)]
-            if Points:
-                filtered_shot_df = filtered_shot_df[filtered_shot_df['scoreValue'] == int(points)]
-            if Time:
-                filtered_shot_df = filtered_shot_df[(filtered_shot_df['clock.minutes'] >= timemin) & (filtered_shot_df['clock.minutes'] <= timemax)]
-            if Make:
-                filtered_shot_df = filtered_shot_df[filtered_shot_df['scoringPlay'] == rmakemiss]
-        
-            # Initialize an empty list to store trace objects
-            traces = []
-            message_placeholder = st.empty()
-            message2 = st.empty()
-            message3 = st.empty()
-            messages = []
-    
-            game_coords_df = pd.DataFrame()  # Initialize empty DataFrame to store all shot coordinates
-    
-            traces = []
-            message_placeholder = st.empty()
-            message2 = st.empty()
-            message3 = st.empty()
-            messages = []
-            
-            for index, row in game_shots_df.iterrows():
-                # Assuming BasketballShot class or function to generate shot coordinates
-                shot = BasketballShot(
-                    shot_start_x=row['coordinate.x'], 
-                    shot_start_y=row['coordinate.y'], 
-                    shot_id=row['sequenceNumber'],
-                    play_description=row['text'],
-                    shot_made=row['scoringPlay'],
-                    team=row['team'],
-                    quarter=row['period.displayValue'],
-                    time=row['clock.displayValue'])
-                
-                shot_df = shot.get_shot_path_coordinates()
-                game_coords_df = pd.concat([game_coords_df, shot_df])
-    
-                # Draw shot paths
-                color_map = {'home': home_color2, 'away': away_color}
-                shot_path_fig = px.line_3d(
-                    data_frame=game_coords_df,
-                    x='x',
-                    y='y',
-                    z='z',
-                    line_group='line_id',
-                    color='team',
-                    color_discrete_map=color_map,
-                    custom_data=['description', 'z', 'quarter', 'time']
-                )
-    
-                hovertemplate = '%{customdata[0]}<br>%{customdata[2]} - %{customdata[3]}'
-                shot_path_fig.update_traces(opacity=0.55, hovertemplate=hovertemplate, showlegend=False)
-    
-                # Draw shot start scatter plots
-                game_coords_start = game_coords_df[game_coords_df['shot_coord_index'] == 0]
-                symbol_map = {'made': 'circle-open', 'missed': 'cross'}
-                color_map = {'home': home_color, 'away': away_color2}
-                shot_start_fig = px.scatter_3d(
-                    data_frame=game_coords_start,
-                    x='x',
-                    y='y',
-                    z='z',
-                    custom_data=['description', 'z', 'quarter', 'time'],
-                    color='team',
-                    color_discrete_map=color_map,
-                    symbol='shot_made',
-                    symbol_map=symbol_map,
-                )
-    
-                shot_start_fig.update_traces(marker_size=10, hovertemplate=hovertemplate,showlegend=False)
-    
-                # Add shot scatter plot to the existing figure
-                
-    
-                for trace in shot_start_fig.data:
-                    fig.add_trace(trace)
-    
-                # Add shot line plot to the existing figure
-                for trace in shot_path_fig.data:
-                    fig.add_trace(trace)
-    
-                # Update layout and display the figure dynamically
-                fig.update_traces(line=dict(width=5))
-                message = row['text']
-                message2 = row['period.displayValue']
-                message3 = row['clock.displayValue']
-                if row['scoringPlay'] == True:
-                    finalmessage = f"✅ {message} - {message2}: {message3}"
-                else:
-                    finalmessage = f"❌ {message} - {message2}: {message3}"
-                messages.append(finalmessage)
-                placeholder.plotly_chart(fig, use_container_width=True)
-                message_placeholder.text(message)
-                if message == None:
-                    st.text('')
-                else:
-                    message_placeholder.text(f'Latest shot: {message} - {message2}: {message3}')
-                time.sleep(2)
-            placeholder.plotly_chart(fig, use_container_width=True)
-            coli1,coli2 = st.columns(2)
-            if awaytotal != 0:
-                awayper = (awaycount/awaytotal) * 100
-                awayper = round(awayper,2)
-            else:
-                awayper = 0
-            if hometotal != 0:
-                homeper = (homecount/hometotal) * 100
-                homeper = round(homeper,2)
-            else:
-                homeper = 0
-            with coli1:
-                st.markdown(f'<h3 style="text-align:center;">'
-                f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}:</span> '
-                f'<span style="color: {away_color};">{awaycount}/{awaytotal} ({awayper}%)</span> '
-                f'</h3>', unsafe_allow_html=True)
-            with coli2:
-                st.markdown(f'<h3 style="text-align:center;">'
-                f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}:</span> '
-                f'<span style="color: {home_color};">{homecount}/{hometotal} ({homeper}%)</span> '
-                f'</h3>', unsafe_allow_html=True)
-            with st.expander('All Shots'):
-                for msg in messages:
-                    st.text(msg)
-            if normalplot:
-                st.plotly_chart(fig, use_container_width=True)
-                coli1,coli2 = st.columns(2)
-                if awaytotal != 0:
-                    awayper = (awaycount/awaytotal) * 100
-                    awayper = round(awayper,2)
-                else:
-                    awayper = 0
-                if hometotal != 0:
-                    homeper = (homecount/hometotal) * 100
-                    homeper = round(homeper,2)
-                else:
-                    homeper = 0
-                with coli1:
-                    st.markdown(f'<h3 style="text-align:center;">'
-                    f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}:</span> '
-                    f'<span style="color: {away_color};">{awaycount}/{awaytotal} ({awayper}%)</span> '
-                    f'</h3>', unsafe_allow_html=True)
-                with coli2:
-                    st.markdown(f'<h3 style="text-align:center;">'
-                    f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}:</span> '
-                    f'<span style="color: {home_color};">{homecount}/{hometotal} ({homeper}%)</span> '
-                    f'</h3>', unsafe_allow_html=True)
+        selected_points = plotly_events(fig, click_event=True, hover_event=False)
+        if selected_season >= 2015:
+            st.caption("Click on a marker to view the highlight video")
+# Display the plot
+# st.plotly_chart(fig, use_container_width=True)
 
-        else:
-            st.plotly_chart(fig, use_container_width=True)
-            coli1,coli2 = st.columns(2)
-            if awaytotal != 0:
-                awayper = (awaycount/awaytotal) * 100
-                awayper = round(awayper,2)
-            else:
-                awayper = 0
-            if hometotal != 0:
-                homeper = (homecount/hometotal) * 100
-                homeper = round(homeper,2)
-            else:
-                homeper = 0
-            with coli1:
-                st.markdown(f'<h3 style="text-align:center;">'
-                f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}:</span> '
-                f'<span style="color: {away_color};">{awaycount}/{awaytotal} ({awayper}%)</span> '
-                f'</h3>', unsafe_allow_html=True)
-            with coli2:
-                st.markdown(f'<h3 style="text-align:center;">'
-                f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}:</span> '
-                f'<span style="color: {home_color};">{homecount}/{hometotal} ({homeper}%)</span> '
-                f'</h3>', unsafe_allow_html=True)
+        # Display selected points
+        if selected_points:
+            for point in selected_points:
+                # Extract point details
+                x_val = point.get('x', 'N/A')
+                y_val = point.get('y', 'N/A')
+                z_val = point.get('z', 'N/A')
+                curve_number = point.get('curveNumber', 'N/A')
+                point_number = point.get('pointNumber', 'N/A')
+                
+                # Find the corresponding description based on index
+                description = 'No description available'
+                if point_number < len(game_coords_df):
+                    game_coords_df2 = game_coords_df[game_coords_df['x'] == x_val]
+                    game_coords_df2 = game_coords_df2[game_coords_df2['y'] == y_val]
+                description = game_coords_df2['description'].iloc[0]
+                time = game_coords_df2['time'].iloc[0]
+                game2 = game_shots_df[game_shots_df['text'] == description]
+                game2 = game2[game2['time'] == time]
+                abbreviation = game2['homeTeamAbbrev'].iloc[0]
+                abbreviation2 = game2['awayTeamAbbrev'].iloc[0]
+                from nba_api.stats.static import teams
+
+                nba_teams = teams.get_teams()
+                # Select the dictionary for the Celtics, which contains their team ID
+                # st.write(abbreviation)
+                team = [team for team in nba_teams if team['abbreviation'] == abbreviation][0]
+                teamidreal = team['id']
+                # st.write(teamidreal)
+                from nba_api.stats.endpoints import leaguegamefinder
+
+                # Query for games where the Celtics were playing
+                gamefinder = leaguegamefinder.LeagueGameFinder(team_id_nullable=teamidreal)
+                # The first DataFrame of those returned is what we want.
+                games = gamefinder.get_data_frames()[0]
+                games = games[games['MATCHUP'].str.contains(abbreviation2, na=False)]
+                # Convert to datetime object
+# Convert to datetime object
+                # st.write(games)
+                date_obj = datetime.strptime(date1, '%m/%d/%Y')
+
+                # Convert to desired format
+                date2 = date_obj.strftime('%Y-%m-%d')
+
+                # Attempt to filter games by the original date
+                fgames = games[games['GAME_DATE'] == date2]
+
+                # Check if games DataFrame is empty
+                if fgames.empty:
+                    # If no games found, subtract one day and filter again
+                    new_date_obj = date_obj - timedelta(days=1)
+                    date2 = new_date_obj.strftime('%Y-%m-%d')
+                    
+                    # Attempt to filter games by the new date
+                    fgames = games[games['GAME_DATE'] == date2]
+                games = fgames
+                # st.write(date2)
+                # st.write(games)
+                game_id = games['GAME_ID'].iloc[0]
+                playid = game2['sequenceNumber'].iloc[0]
+                headers = {
+                'Host': 'stats.nba.com',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:72.0) Gecko/20100101 Firefox/72.0',
+                'Accept': 'application/json, text/plain, */*',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'x-nba-stats-origin': 'stats',
+                'x-nba-stats-token': 'true',
+                'Connection': 'keep-alive',
+                'Referer': 'https://stats.nba.com/',
+                'Pragma': 'no-cache',
+                'Cache-Control': 'no-cache'
+            }
+                event_id = playid
+
+
+
+                url = 'https://stats.nba.com/stats/videoeventsasset?GameEventID={}&GameID={}'.format(
+                            event_id, game_id)
+                r = requests.get(url, headers=headers)
+                if r.status_code == 200:
+                    json = r.json()
+                    video_urls = json['resultSets']['Meta']['videoUrls']
+                    playlist = json['resultSets']['playlist']
+                    video_event = {'video': video_urls[0]['lurl'], 'desc': playlist[0]['dsc']}
+                    video = video_urls[0]['lurl']
+
+                # Display point details
+                
+                # st.write(game2)
+                if selected_season >= 2015:
+                    col1,col2,col3 = st.columns(3)
+
+                    with col2:
+                        st.video(video)
+                        st.write(description)
+
+       
+
+        # graph styling
+        # normalplot = st.sidebar.button('Normal Plot')
+        # play = st.sidebar.button('Play by play')
+        
+        # if play:
+        #     # Draw basketball court lines
+        #     court = CourtCoordinates()
+        #     court_lines_df = court.get_court_lines()
+    
+        #     fig = px.line_3d(
+        #     data_frame=court_lines_df,
+        #     x='x',
+        #     y='y',
+        #     z='z',
+        #     line_group='line_group',
+        #     color='color',
+        #     color_discrete_map={
+        #         'court': '#000000',
+        #         'hoop': '#e47041',
+        #         'net': '#D3D3D3',
+        #         'backboard': 'gray'
+        #     }
+        # )
+        #     fig.update_traces(hovertemplate=None, hoverinfo='skip', showlegend=False)
+        #     fig.update_traces(line=dict(width=5))
+    
+        #     # Apply layout settings
+        #     fig.update_layout(    
+        #         margin=dict(l=20, r=20, t=20, b=20),
+        #         scene_aspectmode="data",
+        #         height=600,
+        #         scene_camera=dict(
+        #             eye=dict(x=1.5, y=0, z=0.2)
+        #         ),
+        #         scene=dict(
+        #             xaxis=dict(title='', showticklabels=False, showgrid=False),
+        #             yaxis=dict(title='', showticklabels=False, showgrid=False),
+        #             zaxis=dict(title='', showticklabels=False, showgrid=False, showbackground=True, backgroundcolor='#d2a679'),
+        #         )
+        #     )
+    
+        #     # Create a Streamlit placeholder for the plot
+        #     placeholder = st.empty()
+    
+        #     # Prepare data filters
+        #     filters = {
+        #         'period.displayValue': quart if Quarter else None,
+        #         'Shot Distance': (shotdistance_min, shotdistance_max) if Shotdist else None,
+        #         'text': players if Player else None,
+        #         'type.text': finaltype if Shottype else None,
+        #         'scoreValue': int(points) if Points else None,
+        #         'clock.minutes': (timemin, timemax) if Time else None
+        #     }
+    
+        #     filtered_shot_df = df.copy()
+    
+        #     if Quarter:
+        #         filtered_shot_df = filtered_shot_df[filtered_shot_df['period.displayValue'].isin(quart)]
+        #     if Shotdist:
+        #         filtered_shot_df = filtered_shot_df[(filtered_shot_df['Shot Distance'] >= shotdistance_min) & (filtered_shot_df['Shot Distance'] <= shotdistance_max)]
+        #     if Player:
+        #         filtered_shot_df = filter_player_actions(filtered_shot_df, player_names)
+        #         # game_shots_df = game_shots_df[game_shots_df['text'].str.contains('|'.join(player_names), case=False, na=False)]
+        #     if Shottype:
+        #         filtered_shot_df = filtered_shot_df[filtered_shot_df['type.text'].isin(shottype)]
+        #     if Points:
+        #         filtered_shot_df = filtered_shot_df[filtered_shot_df['scoreValue'] == int(points)]
+        #     if Time:
+        #         filtered_shot_df = filtered_shot_df[(filtered_shot_df['clock.minutes'] >= timemin) & (filtered_shot_df['clock.minutes'] <= timemax)]
+        #     if Make:
+        #         filtered_shot_df = filtered_shot_df[filtered_shot_df['scoringPlay'] == rmakemiss]
+        
+        #     # Initialize an empty list to store trace objects
+        #     traces = []
+        #     message_placeholder = st.empty()
+        #     message2 = st.empty()
+        #     message3 = st.empty()
+        #     messages = []
+    
+        #     game_coords_df = pd.DataFrame()  # Initialize empty DataFrame to store all shot coordinates
+    
+        #     traces = []
+        #     message_placeholder = st.empty()
+        #     message2 = st.empty()
+        #     message3 = st.empty()
+        #     messages = []
+            
+        #     for index, row in game_shots_df.iterrows():
+        #         # Assuming BasketballShot class or function to generate shot coordinates
+        #         shot = BasketballShot(
+        #             shot_start_x=row['coordinate.x'], 
+        #             shot_start_y=row['coordinate.y'], 
+        #             shot_id=row['sequenceNumber'],
+        #             play_description=row['text'],
+        #             shot_made=row['scoringPlay'],
+        #             team=row['team'],
+        #             quarter=row['period.displayValue'],
+        #             time=row['clock.displayValue'])
+                
+        #         shot_df = shot.get_shot_path_coordinates()
+        #         game_coords_df = pd.concat([game_coords_df, shot_df])
+    
+        #         # Draw shot paths
+        #         color_map = {'home': home_color2, 'away': away_color}
+        #         shot_path_fig = px.line_3d(
+        #             data_frame=game_coords_df,
+        #             x='x',
+        #             y='y',
+        #             z='z',
+        #             line_group='line_id',
+        #             color='team',
+        #             color_discrete_map=color_map,
+        #             custom_data=['description', 'z', 'quarter', 'time']
+        #         )
+    
+        #         hovertemplate = '%{customdata[0]}<br>%{customdata[2]} - %{customdata[3]}'
+        #         shot_path_fig.update_traces(opacity=0.55, hovertemplate=hovertemplate, showlegend=False)
+    
+        #         # Draw shot start scatter plots
+        #         game_coords_start = game_coords_df[game_coords_df['shot_coord_index'] == 0]
+        #         symbol_map = {'made': 'circle-open', 'missed': 'cross'}
+        #         color_map = {'home': home_color, 'away': away_color2}
+        #         shot_start_fig = px.scatter_3d(
+        #             data_frame=game_coords_start,
+        #             x='x',
+        #             y='y',
+        #             z='z',
+        #             custom_data=['description', 'z', 'quarter', 'time'],
+        #             color='team',
+        #             color_discrete_map=color_map,
+        #             symbol='shot_made',
+        #             symbol_map=symbol_map,
+        #         )
+    
+        #         shot_start_fig.update_traces(marker_size=10, hovertemplate=hovertemplate,showlegend=False)
+    
+        #         # Add shot scatter plot to the existing figure
+                
+    
+        #         for trace in shot_start_fig.data:
+        #             fig.add_trace(trace)
+    
+        #         # Add shot line plot to the existing figure
+        #         for trace in shot_path_fig.data:
+        #             fig.add_trace(trace)
+    
+        #         # Update layout and display the figure dynamically
+        #         fig.update_traces(line=dict(width=5))
+        #         message = row['text']
+        #         message2 = row['period.displayValue']
+        #         message3 = row['clock.displayValue']
+        #         if row['scoringPlay'] == True:
+        #             finalmessage = f"✅ {message} - {message2}: {message3}"
+        #         else:
+        #             finalmessage = f"❌ {message} - {message2}: {message3}"
+        #         messages.append(finalmessage)
+        #         placeholder.plotly_chart(fig, use_container_width=True)
+        #         message_placeholder.text(message)
+        #         if message == None:
+        #             st.text('')
+        #         else:
+        #             message_placeholder.text(f'Latest shot: {message} - {message2}: {message3}')
+        #         time.sleep(2)
+        #     placeholder.plotly_chart(fig, use_container_width=True)
+        #     coli1,coli2 = st.columns(2)
+        #     if awaytotal != 0:
+        #         awayper = (awaycount/awaytotal) * 100
+        #         awayper = round(awayper,2)
+        #     else:
+        #         awayper = 0
+        #     if hometotal != 0:
+        #         homeper = (homecount/hometotal) * 100
+        #         homeper = round(homeper,2)
+        #     else:
+        #         homeper = 0
+        #     with coli1:
+        #         st.markdown(f'<h3 style="text-align:center;">'
+        #         f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}:</span> '
+        #         f'<span style="color: {away_color};">{awaycount}/{awaytotal} ({awayper}%)</span> '
+        #         f'</h3>', unsafe_allow_html=True)
+        #     with coli2:
+        #         st.markdown(f'<h3 style="text-align:center;">'
+        #         f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}:</span> '
+        #         f'<span style="color: {home_color};">{homecount}/{hometotal} ({homeper}%)</span> '
+        #         f'</h3>', unsafe_allow_html=True)
+        #     with st.expander('All Shots'):
+        #         for msg in messages:
+        #             st.text(msg)
+        #     if normalplot:
+        #         st.plotly_chart(fig, use_container_width=True)
+        #         coli1,coli2 = st.columns(2)
+        #         if awaytotal != 0:
+        #             awayper = (awaycount/awaytotal) * 100
+        #             awayper = round(awayper,2)
+        #         else:
+        #             awayper = 0
+        #         if hometotal != 0:
+        #             homeper = (homecount/hometotal) * 100
+        #             homeper = round(homeper,2)
+        #         else:
+        #             homeper = 0
+        #         with coli1:
+        #             st.markdown(f'<h3 style="text-align:center;">'
+        #             f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}:</span> '
+        #             f'<span style="color: {away_color};">{awaycount}/{awaytotal} ({awayper}%)</span> '
+        #             f'</h3>', unsafe_allow_html=True)
+        #         with coli2:
+        #             st.markdown(f'<h3 style="text-align:center;">'
+        #             f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}:</span> '
+        #             f'<span style="color: {home_color};">{homecount}/{hometotal} ({homeper}%)</span> '
+        #             f'</h3>', unsafe_allow_html=True)
+
+        # # else:
+        #     # st.plotly_chart(fig, use_container_width=True)
+        #     coli1,coli2 = st.columns(2)
+        #     if awaytotal != 0:
+        #         awayper = (awaycount/awaytotal) * 100
+        #         awayper = round(awayper,2)
+        #     else:
+        #         awayper = 0
+        #     if hometotal != 0:
+        #         homeper = (homecount/hometotal) * 100
+        #         homeper = round(homeper,2)
+        #     else:
+        #         homeper = 0
+        #     with coli1:
+        #         st.markdown(f'<h3 style="text-align:center;">'
+        #         f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}:</span> '
+        #         f'<span style="color: {away_color};">{awaycount}/{awaytotal} ({awayper}%)</span> '
+        #         f'</h3>', unsafe_allow_html=True)
+        #     with coli2:
+        #         st.markdown(f'<h3 style="text-align:center;">'
+        #         f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}:</span> '
+        #         f'<span style="color: {home_color};">{homecount}/{hometotal} ({homeper}%)</span> '
+        #         f'</h3>', unsafe_allow_html=True)
         nba_data = sportsdataverse.nba.espn_nba_pbp(game_id=id)
         # Check if 'boxscore' exists in the fetched data
         df = nba_data['boxscore']
@@ -828,34 +938,34 @@ if selected_season:
 
 
 
-        # Check if the data was fetched successfully and if 'videos' exists
-        if 'videos' in nba_data and nba_data['videos']:
-            videos_data = nba_data['videos']
+        # # Check if the data was fetched successfully and if 'videos' exists
+        # if 'videos' in nba_data and nba_data['videos']:
+        #     videos_data = nba_data['videos']
             
-            # Convert to DataFrame
-            if isinstance(videos_data, list):
-                try:
-                    videos_df = pd.DataFrame(videos_data)
+        #     # Convert to DataFrame
+        #     if isinstance(videos_data, list):
+        #         try:
+        #             videos_df = pd.DataFrame(videos_data)
                     
-                    # Check if 'links' column exists
-                    if 'links' in videos_df.columns:
-                        # Extract 'links' column
-                        links_df = pd.json_normalize(videos_df['links'])
-                        with st.expander('Videos'):
-                            for index, row in links_df.iterrows():
-                                link = row['source.HD.href']
-                                st.video(link)
+        #             # Check if 'links' column exists
+        #             if 'links' in videos_df.columns:
+        #                 # Extract 'links' column
+        #                 links_df = pd.json_normalize(videos_df['links'])
+        #                 with st.expander('Videos'):
+        #                     for index, row in links_df.iterrows():
+        #                         link = row['source.HD.href']
+        #                         st.video(link)
                         
-                        # Print the new DataFrame to verify                        
-                        # Optionally, save the links DataFrame to a CSV file
-                    else:
-                        st.error("'links' column not found in the DataFrame.")
-                except ValueError as e:
-                    print("Error creating DataFrame:", e)
-            else:
-                st.error("Expected a list of dictionaries or similar format.")
-        else:
-            st.write("")
+        #                 # Print the new DataFrame to verify                        
+        #                 # Optionally, save the links DataFrame to a CSV file
+        #             else:
+        #                 st.error("'links' column not found in the DataFrame.")
+        #         except ValueError as e:
+        #             print("Error creating DataFrame:", e)
+        #     else:
+        #         st.error("Expected a list of dictionaries or similar format.")
+        # else:
+        #     st.write("")
 else:
     image_url = 'https://i.imgur.com/3oGJTcf.png'
 
