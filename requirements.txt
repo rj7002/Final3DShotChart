@@ -5,5 +5,5 @@ pandas>=2.1.0
 sportsdataverse
 datetime>=4.5
 tqdm>=4.65.0
-streamlit-plotly-events>=0.1.0
+streamlit-plotly-events
 nba_api>=1.5.0
