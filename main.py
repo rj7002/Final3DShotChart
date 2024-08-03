@@ -14,6 +14,38 @@ import plotly.graph_objects as go  # Import Plotly graph objects separately
 import time
 import re
 import sportsdataverse
+from streamlit_plotly_events import plotly_events
+from datetime import datetime, timedelta
+
+def display_player_image(player_id, width2, caption2):
+    # Construct the URL for the player image using the player ID
+    image_url = f"https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/{player_id}.png&w=350&h=254"
+    
+    
+    # Check if the image URL returns a successful response
+    response = requests.head(image_url)
+    
+    if response.status_code == 200:
+        # If image is available, display it
+        st.markdown(
+    f'<div style="display: flex; flex-direction: column; align-items: center;">'
+    f'<img src="{image_url}" style="width: {width2}px;">'
+    f'<p style="text-align: center; font-size: 20px;">{caption2}</p>'
+    f'</div>',
+    unsafe_allow_html=True
+)
+    
+    
+        # st.image(image_url, width=width2, caption=caption2)
+    else:
+        image_url = "https://cdn.nba.com/headshots/nba/latest/1040x760/fallback.png"
+        st.markdown(
+        f'<div style="display: flex; flex-direction: column; align-items: center;">'
+        f'<img src="{image_url}" style="width: {width2}px;">'
+        f'<p style="text-align: center;font-size: larger;">{"Image Unavailable"}</p>'
+        f'</div>',
+        unsafe_allow_html=True
+    )
 
 def filter_player_actions(df, player_names):
     # Combine player names into a single regex pattern
@@ -176,6 +208,8 @@ if selected_season:
     id = parts[-1].strip()
     st.write('')
     if id:
+        date1 = parts[-2].strip()
+
         fdf = pd.read_csv('season.csv')
         filtered_df = fdf[fdf['game_id'] == id]
     
@@ -528,9 +562,12 @@ if selected_season:
                 itemsizing='constant'
             )
         )
-        normalplot = st.sidebar.button('Normal Plot')
+        # st.plotly_chart(fig, use_container_width=True)
         play = st.sidebar.button('Play by play')
-        
+        normalplot = st.sidebar.button('Normal Plot')
+        if normalplot:
+            st.experimental_rerun()
+
         if play:
             # Draw basketball court lines
             court = CourtCoordinates()
@@ -576,7 +613,7 @@ if selected_season:
                 'period.displayValue': quart if Quarter else None,
                 'Shot Distance': (shotdistance_min, shotdistance_max) if Shotdist else None,
                 'text': players if Player else None,
-                'type.text': finaltype if Shottype else None,
+                # 'type.text': finaltype if Shottype else None,
                 'scoreValue': int(points) if Points else None,
                 'clock.minutes': (timemin, timemax) if Time else None
             }
@@ -715,53 +752,116 @@ if selected_season:
             with st.expander('All Shots'):
                 for msg in messages:
                     st.text(msg)
-            if normalplot:
-                st.plotly_chart(fig, use_container_width=True)
-                coli1,coli2 = st.columns(2)
-                if awaytotal != 0:
-                    awayper = (awaycount/awaytotal) * 100
-                    awayper = round(awayper,2)
-                else:
-                    awayper = 0
-                if hometotal != 0:
-                    homeper = (homecount/hometotal) * 100
-                    homeper = round(homeper,2)
-                else:
-                    homeper = 0
-                with coli1:
-                    st.markdown(f'<h3 style="text-align:center;">'
-                    f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}:</span> '
-                    f'<span style="color: {away_color};">{awaycount}/{awaytotal} ({awayper}%)</span> '
-                    f'</h3>', unsafe_allow_html=True)
-                with coli2:
-                    st.markdown(f'<h3 style="text-align:center;">'
-                    f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}:</span> '
-                    f'<span style="color: {home_color};">{homecount}/{hometotal} ({homeper}%)</span> '
-                    f'</h3>', unsafe_allow_html=True)
-
         else:
-            st.plotly_chart(fig, use_container_width=True)
-            coli1,coli2 = st.columns(2)
-            if awaytotal != 0:
-                awayper = (awaycount/awaytotal) * 100
-                awayper = round(awayper,2)
-            else:
-                awayper = 0
-            if hometotal != 0:
-                homeper = (homecount/hometotal) * 100
-                homeper = round(homeper,2)
-            else:
-                homeper = 0
-            with coli1:
-                st.markdown(f'<h3 style="text-align:center;">'
-                f'<span style="color: {away_color2};">{df["awayTeamName"].iloc[0]} {df["awayTeamMascot"].iloc[0]}:</span> '
-                f'<span style="color: {away_color};">{awaycount}/{awaytotal} ({awayper}%)</span> '
-                f'</h3>', unsafe_allow_html=True)
-            with coli2:
-                st.markdown(f'<h3 style="text-align:center;">'
-                f'<span style="color: {home_color2};">{df["homeTeamName"].iloc[0]} {df["homeTeamMascot"].iloc[0]}:</span> '
-                f'<span style="color: {home_color};">{homecount}/{hometotal} ({homeper}%)</span> '
-                f'</h3>', unsafe_allow_html=True)
+            selected_points = plotly_events(fig, click_event=True, hover_event=False,select_event=True)
+            if selected_season >= 2015:
+                st.caption("Click on a marker to view the highlight video")
+    # Display the plot
+                
+
+            # Display selected points
+            if selected_points:
+                for point in selected_points:
+                    # Extract point details
+                    x_val = point.get('x', 'N/A')
+                    y_val = point.get('y', 'N/A')
+                    z_val = point.get('z', 'N/A')
+                    curve_number = point.get('curveNumber', 'N/A')
+                    point_number = point.get('pointNumber', 'N/A')
+                    
+                    # Find the corresponding description based on index
+                    description = 'No description available'
+                    if point_number < len(game_coords_df):
+                        game_coords_df2 = game_coords_df[game_coords_df['x'] == x_val]
+                        game_coords_df2 = game_coords_df2[game_coords_df2['y'] == y_val]
+                    description = game_coords_df2['description'].iloc[0]
+                    time = game_coords_df2['time'].iloc[0]
+                    game2 = game_shots_df[game_shots_df['text'] == description]
+                    game2 = game2[game2['time'] == time]
+                    abbreviation = game2['homeTeamAbbrev'].iloc[0]
+                    abbreviation2 = game2['awayTeamAbbrev'].iloc[0]
+                    from nba_api.stats.static import teams
+                    if selected_season >= 2015:
+                        nba_teams = teams.get_teams()
+                        # Select the dictionary for the Celtics, which contains their team ID
+                        # st.write(abbreviation)
+                        if abbreviation == 'GS':
+                            abbreviation = 'GSW'
+                        team = [team for team in nba_teams if team['abbreviation'] == abbreviation][0]
+                        teamidreal = team['id']
+                        # st.write(teamidreal)
+                        from nba_api.stats.endpoints import leaguegamefinder
+
+                        # Query for games where the Celtics were playing
+                        gamefinder = leaguegamefinder.LeagueGameFinder(team_id_nullable=teamidreal)
+                        # The first DataFrame of those returned is what we want.
+                        games = gamefinder.get_data_frames()[0]
+                        games = games[games['MATCHUP'].str.contains(abbreviation2, na=False)]
+                        # Convert to datetime object
+        # Convert to datetime object
+                        # st.write(game2)
+                        playerid = int(game2['participants.0.athlete.id'].iloc[0])
+                        date_obj = datetime.strptime(date1, '%m/%d/%Y')
+
+                        # Convert to desired format
+                        date2 = date_obj.strftime('%Y-%m-%d')
+
+                        # Attempt to filter games by the original date
+                        fgames = games[games['GAME_DATE'] == date2]
+
+                        # Check if games DataFrame is empty
+                        if fgames.empty:
+                            # If no games found, subtract one day and filter again
+                            new_date_obj = date_obj - timedelta(days=1)
+                            date2 = new_date_obj.strftime('%Y-%m-%d')
+                            
+                            # Attempt to filter games by the new date
+                            fgames = games[games['GAME_DATE'] == date2]
+                        games = fgames
+                        # st.write(date2)
+                        # st.write(games)
+                        game_id = games['GAME_ID'].iloc[0]
+                        playid = game2['sequenceNumber'].iloc[0]
+                        headers = {
+                        'Host': 'stats.nba.com',
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:72.0) Gecko/20100101 Firefox/72.0',
+                        'Accept': 'application/json, text/plain, */*',
+                        'Accept-Language': 'en-US,en;q=0.5',
+                        'Accept-Encoding': 'gzip, deflate, br',
+                        'x-nba-stats-origin': 'stats',
+                        'x-nba-stats-token': 'true',
+                        'Connection': 'keep-alive',
+                        'Referer': 'https://stats.nba.com/',
+                        'Pragma': 'no-cache',
+                        'Cache-Control': 'no-cache'
+                    }
+                        event_id = playid
+
+
+
+                        url = 'https://stats.nba.com/stats/videoeventsasset?GameEventID={}&GameID={}'.format(
+                                    event_id, game_id)
+                        r = requests.get(url, headers=headers)
+                        if r.status_code == 200:
+                            json = r.json()
+                            video_urls = json['resultSets']['Meta']['videoUrls']
+                            playlist = json['resultSets']['playlist']
+                            video_event = {'video': video_urls[0]['lurl'], 'desc': playlist[0]['dsc']}
+                            video = video_urls[0]['lurl']
+
+                        # Display point details
+                        
+                        # st.write(game2)
+                        if selected_season >= 2015:
+                            col1,col2, = st.columns(2)
+                            with col1:
+                                display_player_image(playerid,400,'')
+                            with col2:
+                                st.write(description)
+
+                                st.video(video)
+
+       
         nba_data = sportsdataverse.nba.espn_nba_pbp(game_id=id)
         # Check if 'boxscore' exists in the fetched data
         df = nba_data['boxscore']
@@ -828,34 +928,34 @@ if selected_season:
 
 
 
-        # Check if the data was fetched successfully and if 'videos' exists
-        if 'videos' in nba_data and nba_data['videos']:
-            videos_data = nba_data['videos']
+        # # Check if the data was fetched successfully and if 'videos' exists
+        # if 'videos' in nba_data and nba_data['videos']:
+        #     videos_data = nba_data['videos']
             
-            # Convert to DataFrame
-            if isinstance(videos_data, list):
-                try:
-                    videos_df = pd.DataFrame(videos_data)
+        #     # Convert to DataFrame
+        #     if isinstance(videos_data, list):
+        #         try:
+        #             videos_df = pd.DataFrame(videos_data)
                     
-                    # Check if 'links' column exists
-                    if 'links' in videos_df.columns:
-                        # Extract 'links' column
-                        links_df = pd.json_normalize(videos_df['links'])
-                        with st.expander('Videos'):
-                            for index, row in links_df.iterrows():
-                                link = row['source.HD.href']
-                                st.video(link)
+        #             # Check if 'links' column exists
+        #             if 'links' in videos_df.columns:
+        #                 # Extract 'links' column
+        #                 links_df = pd.json_normalize(videos_df['links'])
+        #                 with st.expander('Videos'):
+        #                     for index, row in links_df.iterrows():
+        #                         link = row['source.HD.href']
+        #                         st.video(link)
                         
-                        # Print the new DataFrame to verify                        
-                        # Optionally, save the links DataFrame to a CSV file
-                    else:
-                        st.error("'links' column not found in the DataFrame.")
-                except ValueError as e:
-                    print("Error creating DataFrame:", e)
-            else:
-                st.error("Expected a list of dictionaries or similar format.")
-        else:
-            st.write("")
+        #                 # Print the new DataFrame to verify                        
+        #                 # Optionally, save the links DataFrame to a CSV file
+        #             else:
+        #                 st.error("'links' column not found in the DataFrame.")
+        #         except ValueError as e:
+        #             print("Error creating DataFrame:", e)
+        #     else:
+        #         st.error("Expected a list of dictionaries or similar format.")
+        # else:
+        #     st.write("")
 else:
     image_url = 'https://i.imgur.com/3oGJTcf.png'
 
