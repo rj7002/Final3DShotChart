@@ -534,7 +534,7 @@ if selected_season:
         )
         selected_points = plotly_events(fig, click_event=True, hover_event=False)
         if selected_season >= 2015:
-            st.caption("Click on a marker to view the highlight video")
+            st.write("Click on a marker to view the highlight video")
 # Display the plot
 # st.plotly_chart(fig, use_container_width=True)
 
